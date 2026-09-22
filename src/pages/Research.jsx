@@ -11,8 +11,8 @@ export function Research() {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-cyan-400" />
-            <h1 className="text-2xl font-heading font-bold text-white tracking-wide">
+            <BookOpen className="w-5 h-5 text-slate-300" />
+            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
               METHODOLOGY & SCIENTIFIC ARCHITECTURE
             </h1>
           </div>
@@ -34,38 +34,38 @@ export function Research() {
       <DataFlowDiagram />
 
       {/* Novelty & SIH Innovation Statement */}
-      <div className="bg-[#111622] border border-cyan-500/30 rounded-lg p-5">
-        <h3 className="font-heading font-bold text-base text-white mb-2">
+      <div className="bg-[#101520] border border-white/10 rounded-lg p-5">
+        <h3 className="font-heading font-semibold text-base text-white mb-2">
           INNOVATION HIGHLIGHTS FOR SMART INDIA HACKATHON 2026 JURORS
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-xs font-sans">
           
-          <div className="bg-[#161d2d] border border-white/[0.04] p-4 rounded-lg">
-            <div className="w-8 h-8 rounded bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-2 font-bold font-mono-tech">
+          <div className="bg-[#141a27] border border-white/[0.04] p-4 rounded-lg">
+            <div className="w-7 h-7 rounded bg-white/[0.05] border border-white/10 flex items-center justify-center text-slate-300 mb-2 font-medium font-mono-tech text-xs">
               01
             </div>
-            <h4 className="font-bold text-white mb-1">Overcoming Pure-AI Physical Drift</h4>
+            <h4 className="font-semibold text-white mb-1">Overcoming Pure-AI Physical Drift</h4>
             <p className="text-slate-400 leading-relaxed">
               Pure AI weather models minimize mean squared error, which causes artificial blurring and violations of mass/energy conservation. Algoriot constrains AI rollouts with NWP dynamical boundaries.
             </p>
           </div>
 
-          <div className="bg-[#161d2d] border border-white/[0.04] p-4 rounded-lg">
-            <div className="w-8 h-8 rounded bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-2 font-bold font-mono-tech">
+          <div className="bg-[#141a27] border border-white/[0.04] p-4 rounded-lg">
+            <div className="w-7 h-7 rounded bg-white/[0.05] border border-white/10 flex items-center justify-center text-slate-300 mb-2 font-medium font-mono-tech text-xs">
               02
             </div>
-            <h4 className="font-bold text-white mb-1">Regime-Adaptive Meta-Learning</h4>
+            <h4 className="font-semibold text-white mb-1">Regime-Adaptive Meta-Learning</h4>
             <p className="text-slate-400 leading-relaxed">
               Static ensemble averages fail during rapid monsoon onset or cyclonic storm tracks. Algoriot dynamically adjusts model weighting based on real-time atmospheric regime classifications.
             </p>
           </div>
 
-          <div className="bg-[#161d2d] border border-white/[0.04] p-4 rounded-lg">
-            <div className="w-8 h-8 rounded bg-amber-950/60 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-2 font-bold font-mono-tech">
+          <div className="bg-[#141a27] border border-white/[0.04] p-4 rounded-lg">
+            <div className="w-7 h-7 rounded bg-white/[0.05] border border-white/10 flex items-center justify-center text-slate-300 mb-2 font-medium font-mono-tech text-xs">
               03
             </div>
-            <h4 className="font-bold text-white mb-1">Calibrated Tail-Risk Prediction</h4>
+            <h4 className="font-semibold text-white mb-1">Calibrated Tail-Risk Prediction</h4>
             <p className="text-slate-400 leading-relaxed">
               By combining Conformal Prediction with Generalized Extreme Value (GEV) theory, disaster managers obtain robust 90% uncertainty intervals rather than deceptive single-number forecasts.
             </p>

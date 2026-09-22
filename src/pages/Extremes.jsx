@@ -18,8 +18,8 @@ export function Extremes() {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <ShieldAlert className="w-6 h-6 text-rose-500 animate-pulse" />
-            <h1 className="text-2xl font-heading font-bold text-white tracking-wide">
+            <ShieldAlert className="w-5 h-5 text-rose-300/90" />
+            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
               EXTREME WEATHER & DISASTER INTELLIGENCE
             </h1>
           </div>
@@ -31,22 +31,22 @@ export function Extremes() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleExportBrief}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-xs font-mono-tech hover:bg-rose-500/30 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.08] text-slate-100 border border-white/15 text-xs font-mono-tech hover:bg-white/[0.12] transition-colors cursor-pointer font-medium"
           >
-            <FileText className="w-3.5 h-3.5" />
+            <FileText className="w-3.5 h-3.5 text-slate-300" />
             <span>{exported ? "NDMA Brief Exported!" : "Export NDMA Incident Brief"}</span>
           </button>
         </div>
       </div>
 
       {/* Disaster Command Operational Alert Summary */}
-      <div className="bg-gradient-to-r from-rose-950/40 via-[#111622] to-amber-950/40 border border-rose-500/30 rounded-lg p-5">
-        <div className="flex items-center gap-2 text-rose-400 font-mono-tech text-xs uppercase tracking-wider font-semibold mb-2">
-          <Radio className="w-4 h-4 animate-ping" />
+      <div className="bg-[#101520] border border-white/[0.08] rounded-lg p-5">
+        <div className="flex items-center gap-2 text-rose-300/90 font-mono-tech text-xs uppercase tracking-wider font-medium mb-2">
+          <Radio className="w-4 h-4 text-rose-300/80" />
           <span>EARLY WARNING SYNTHESIS PROTOCOL</span>
         </div>
         
-        <h3 className="text-lg font-heading font-bold text-white mb-2">
+        <h3 className="text-lg font-heading font-semibold text-white mb-2">
           Automated Multi-Model Hazard Detection System
         </h3>
         
@@ -56,17 +56,17 @@ export function Extremes() {
 
         {/* National Emergency Support Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-white/[0.06] text-xs font-mono-tech">
-          <div className="flex items-center gap-2 text-slate-300 bg-black/30 p-2 rounded">
-            <PhoneCall className="w-4 h-4 text-cyan-400 shrink-0" />
-            <span>NDRF Hotline: <strong>011-24363260</strong></span>
+          <div className="flex items-center gap-2 text-slate-300 bg-black/30 p-2 rounded border border-white/[0.04]">
+            <PhoneCall className="w-4 h-4 text-slate-400 shrink-0" />
+            <span>NDRF Hotline: <strong className="text-slate-200">011-24363260</strong></span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300 bg-black/30 p-2 rounded">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>CAP Protocol: <strong>ITU-T X.1303 Active</strong></span>
+          <div className="flex items-center gap-2 text-slate-300 bg-black/30 p-2 rounded border border-white/[0.04]">
+            <CheckCircle2 className="w-4 h-4 text-emerald-300/80 shrink-0" />
+            <span>CAP Protocol: <strong className="text-slate-200">ITU-T X.1303 Active</strong></span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300 bg-black/30 p-2 rounded">
-            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Emergency Operations Center: <strong>Active</strong></span>
+          <div className="flex items-center gap-2 text-slate-300 bg-black/30 p-2 rounded border border-white/[0.04]">
+            <ShieldAlert className="w-4 h-4 text-amber-300/80 shrink-0" />
+            <span>Emergency Operations Center: <strong className="text-slate-200">Active</strong></span>
           </div>
         </div>
       </div>

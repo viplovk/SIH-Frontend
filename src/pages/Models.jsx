@@ -66,8 +66,8 @@ export function Models() {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-cyan-400" />
-            <h1 className="text-2xl font-heading font-bold text-white tracking-wide">
+            <Cpu className="w-5 h-5 text-slate-300" />
+            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
               MULTI-MODEL ARCHITECTURE & DYNAMIC BLENDING
             </h1>
           </div>
@@ -78,20 +78,20 @@ export function Models() {
 
         <button
           onClick={openExplainModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-xs font-mono-tech hover:bg-cyan-500/30 transition-colors self-start md:self-auto cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.08] text-slate-100 border border-white/15 text-xs font-mono-tech hover:bg-white/[0.12] transition-colors self-start md:self-auto cursor-pointer font-medium"
         >
-          <HelpCircle className="w-3.5 h-3.5" />
+          <HelpCircle className="w-3.5 h-3.5 text-slate-300" />
           <span>Explain Weighting Math</span>
         </button>
       </div>
 
       {/* Interactive Dynamic Weight Simulator for SIH Judges */}
-      <div className="bg-[#111622] border border-cyan-500/40 rounded-lg p-5">
+      <div className="bg-[#101520] border border-white/10 rounded-lg p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-2">
           <div>
             <div className="flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-cyan-400" />
-              <h3 className="font-heading font-bold text-base text-white">
+              <Sliders className="w-4 h-4 text-slate-300" />
+              <h3 className="font-heading font-semibold text-base text-white">
                 INTERACTIVE META-LEARNER WEIGHT SIMULATOR
               </h3>
             </div>
@@ -99,7 +99,7 @@ export function Models() {
               Manipulate atmospheric conditions to test how the blending engine adapts weights in real-time
             </p>
           </div>
-          <span className="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">
+          <span className="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 text-slate-300">
             SIH JURY INTERACTIVE BENCH
           </span>
         </div>
@@ -113,7 +113,7 @@ export function Models() {
             <div>
               <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
                 <span>Convective Instability (CAPE):</span>
-                <span className="text-cyan-400 font-bold">{capeIndex} J/kg</span>
+                <span className="text-slate-200 font-semibold">{capeIndex} J/kg</span>
               </div>
               <input
                 type="range"
@@ -122,7 +122,7 @@ export function Models() {
                 step="50"
                 value={capeIndex}
                 onChange={(e) => setCapeIndex(Number(e.target.value))}
-                className="w-full accent-cyan-400 cursor-pointer"
+                className="w-full accent-slate-400 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] font-mono-tech text-slate-500 mt-0.5">
                 <span>Stable (200 J/kg)</span>
@@ -135,7 +135,7 @@ export function Models() {
             <div>
               <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
                 <span>Forecast Lead Time Horizon:</span>
-                <span className="text-amber-400 font-bold">+{leadTimeHours} Hours</span>
+                <span className="text-slate-200 font-semibold">+{leadTimeHours} Hours</span>
               </div>
               <input
                 type="range"
@@ -144,7 +144,7 @@ export function Models() {
                 step="3"
                 value={leadTimeHours}
                 onChange={(e) => setLeadTimeHours(Number(e.target.value))}
-                className="w-full accent-amber-400 cursor-pointer"
+                className="w-full accent-slate-400 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] font-mono-tech text-slate-500 mt-0.5">
                 <span>Nowcasting (+3h)</span>
@@ -169,8 +169,8 @@ export function Models() {
                     onClick={() => setTerrainComplexity(t.id)}
                     className={`py-1.5 px-2 rounded border text-center transition-colors cursor-pointer ${
                       terrainComplexity === t.id
-                        ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold"
-                        : "bg-[#161d2d] text-slate-400 border-white/[0.05]"
+                        ? "bg-white/[0.08] text-slate-100 border-white/20 font-medium"
+                        : "bg-[#141a27] text-slate-400 border-white/[0.04]"
                     }`}
                   >
                     {t.label}
@@ -182,9 +182,9 @@ export function Models() {
           </div>
 
           {/* Real-Time Result Output (6 cols) */}
-          <div className="lg:col-span-6 bg-[#161d2d] border border-white/[0.06] rounded-lg p-4 flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-[#141a27] border border-white/[0.06] rounded-lg p-4 flex flex-col justify-between">
             <div>
-              <div className="text-xs font-mono-tech text-cyan-400 uppercase tracking-wider mb-2 font-semibold">
+              <div className="text-xs font-mono-tech text-slate-300 uppercase tracking-wider mb-2 font-medium">
                 SIMULATED WEIGHT RESOLUTION:
               </div>
 
@@ -192,30 +192,30 @@ export function Models() {
                 <div>
                   <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
                     <span>NWP Model (Physics Navier-Stokes):</span>
-                    <strong className="text-sky-400">{simWeights.nwp}%</strong>
+                    <strong className="text-slate-300">{simWeights.nwp}%</strong>
                   </div>
                   <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-sky-400 transition-all duration-300" style={{ width: `${simWeights.nwp}%` }} />
+                    <div className="h-full bg-slate-400 transition-all duration-300" style={{ width: `${simWeights.nwp}%` }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
                     <span>AI Model A (FuXi Spherical Graph):</span>
-                    <strong className="text-emerald-400">{simWeights.aiA}%</strong>
+                    <strong className="text-emerald-300/90">{simWeights.aiA}%</strong>
                   </div>
                   <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-400 transition-all duration-300" style={{ width: `${simWeights.aiA}%` }} />
+                    <div className="h-full bg-emerald-400/80 transition-all duration-300" style={{ width: `${simWeights.aiA}%` }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
                     <span>AI Model B (WeatherNext ViT):</span>
-                    <strong className="text-amber-400">{simWeights.aiB}%</strong>
+                    <strong className="text-amber-300/90">{simWeights.aiB}%</strong>
                   </div>
                   <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-400 transition-all duration-300" style={{ width: `${simWeights.aiB}%` }} />
+                    <div className="h-full bg-amber-400/80 transition-all duration-300" style={{ width: `${simWeights.aiB}%` }} />
                   </div>
                 </div>
               </div>

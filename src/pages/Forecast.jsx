@@ -54,8 +54,8 @@ export function Forecast() {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <CloudSun className="w-5 h-5 text-cyan-400" />
-            <h1 className="text-2xl font-heading font-bold text-white tracking-wide">
+            <CloudSun className="w-5 h-5 text-slate-300" />
+            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
               HIGH-RESOLUTION HYBRID METEOROLOGICAL FORECAST
             </h1>
           </div>
@@ -69,15 +69,15 @@ export function Forecast() {
             onClick={handleExportJSON}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border border-white/[0.1] text-xs font-mono-tech transition-colors cursor-pointer"
           >
-            <FileDown className="w-3.5 h-3.5 text-cyan-400" />
+            <FileDown className="w-3.5 h-3.5 text-slate-300" />
             <span>{downloadSuccess ? "Report Downloaded!" : "Export Forecast JSON"}</span>
           </button>
 
           <button
             onClick={openExplainModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-xs font-mono-tech hover:bg-cyan-500/30 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.08] text-slate-100 border border-white/15 text-xs font-mono-tech hover:bg-white/[0.12] transition-colors cursor-pointer font-medium"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-slate-300" />
             <span>Audit Weights</span>
           </button>
         </div>
@@ -100,10 +100,10 @@ export function Forecast() {
       </div>
 
       {/* Detailed Chronological Forecast Table */}
-      <div className="bg-[#111622] border border-white/[0.08] rounded-lg p-5 overflow-hidden">
+      <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-5 overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-2">
           <div>
-            <h3 className="font-heading font-bold text-base text-white">
+            <h3 className="font-heading font-semibold text-base text-white">
               CHRONOLOGICAL HOURLY RECONCILIATION
             </h3>
             <p className="text-[11px] font-mono-tech text-slate-400">
@@ -111,7 +111,7 @@ export function Forecast() {
             </p>
           </div>
           {isMockMode && (
-            <span className="text-[10px] font-mono-tech uppercase text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/30">
+            <span className="text-[10px] font-mono-tech uppercase text-slate-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">
               DEMO / SIMULATED METRICS
             </span>
           )}
@@ -135,17 +135,17 @@ export function Forecast() {
             <tbody className="divide-y divide-white/[0.04]">
               {timelineData.map((row, idx) => (
                 <tr key={idx} className="hover:bg-white/[0.02] text-slate-300">
-                  <td className="py-2.5 px-3 font-bold text-cyan-300">{row.time}</td>
-                  <td className="py-2.5 px-3 text-white font-bold bg-cyan-950/20">
+                  <td className="py-2.5 px-3 font-medium text-slate-200">{row.time}</td>
+                  <td className="py-2.5 px-3 text-white font-medium bg-white/[0.03]">
                     {row.temperature}°C
                   </td>
                   <td className="py-2.5 px-3 text-slate-400">{row.nwp?.temp}°C</td>
-                  <td className="py-2.5 px-3 text-emerald-400/90">{row.aiA?.temp}°C</td>
-                  <td className="py-2.5 px-3 font-semibold text-sky-400">{row.precipitation} mm</td>
+                  <td className="py-2.5 px-3 text-emerald-300/80">{row.aiA?.temp}°C</td>
+                  <td className="py-2.5 px-3 font-normal text-slate-300">{row.precipitation} mm</td>
                   <td className="py-2.5 px-3">{row.wind} km/h</td>
                   <td className="py-2.5 px-3">{row.humidity}%</td>
                   <td className="py-2.5 px-3 text-slate-400">{row.pressure}</td>
-                  <td className="py-2.5 px-3 text-amber-400">{row.capeIndex}</td>
+                  <td className="py-2.5 px-3 text-amber-300/80">{row.capeIndex}</td>
                 </tr>
               ))}
             </tbody>

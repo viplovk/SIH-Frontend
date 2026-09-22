@@ -3,20 +3,20 @@
 @layer base {
   :root {
     --bg-dark: #0b0e14;
-    --bg-surface: #111622;
-    --bg-surface-elevated: #161d2d;
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-accent: rgba(56, 189, 248, 0.25);
-    --accent-cyan: #38bdf8;
-    --accent-emerald: #34d399;
-    --accent-amber: #fbbf24;
-    --accent-rose: #f43f5e;
+    --bg-surface: #101520;
+    --bg-surface-elevated: #141a27;
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-accent: rgba(148, 163, 184, 0.2);
+    --accent-cyan: #7dd3fc;
+    --accent-emerald: #6ee7b7;
+    --accent-amber: #fcd34d;
+    --accent-rose: #fda4af;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background-color: #0b0e14;
-    color: #e6edf3;
+    color: #e2e8f0;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -32,45 +32,45 @@
 .bg-grid-tech {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
 .bg-radial-vignette {
-  background: radial-gradient(circle at 50% 20%, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 20%, rgba(148, 163, 184, 0.04) 0%, transparent 70%);
 }
 
-/* Leaflet Dark Customization */
+/* Leaflet Dark Customization - Subtle and Restrained */
 .leaflet-container {
   background: #0a0d14 !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
 .leaflet-tile {
-  filter: brightness(0.7) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.65);
+  filter: brightness(0.7) invert(1) contrast(2.2) hue-rotate(205deg) saturate(0.15) brightness(0.65);
 }
 
 .leaflet-popup-content-wrapper {
-  background: #111622 !important;
-  color: #e6edf3 !important;
-  border: 1px solid rgba(56, 189, 248, 0.3) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
+  background: #101520 !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
 }
 
 .leaflet-popup-tip {
-  background: #111622 !important;
+  background: #101520 !important;
 }
 
 .leaflet-bar a {
-  background-color: #111622 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: #101520 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
   color: #94a3b8 !important;
 }
 
 .leaflet-bar a:hover {
-  background-color: #161d2d !important;
-  color: #38bdf8 !important;
+  background-color: #161e2e !important;
+  color: #cbd5e1 !important;
 }
 
 /* Custom technical scrollbar */

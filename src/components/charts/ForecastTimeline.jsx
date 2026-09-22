@@ -31,7 +31,7 @@ export function ForecastTimeline() {
       aiAKey: "aiA.temp",
       aiBKey: "aiB.temp",
       yDomain: ["auto", "auto"],
-      color: "#38bdf8"
+      color: "#7dd3fc"
     },
     precipitation: {
       label: "Precipitation (mm / h)",
@@ -41,7 +41,7 @@ export function ForecastTimeline() {
       aiAKey: "aiA.precip",
       aiBKey: "aiB.precip",
       yDomain: [0, "auto"],
-      color: "#34d399"
+      color: "#6ee7b7"
     },
     wind: {
       label: "Wind Velocity (km/h)",
@@ -51,7 +51,7 @@ export function ForecastTimeline() {
       aiAKey: "aiA.wind",
       aiBKey: "aiB.wind",
       yDomain: [0, "auto"],
-      color: "#a78bfa"
+      color: "#a5b4fc"
     },
     humidity: {
       label: "Relative Humidity (%)",
@@ -61,7 +61,7 @@ export function ForecastTimeline() {
       aiAKey: "aiA.humid",
       aiBKey: "aiB.humid",
       yDomain: [0, 100],
-      color: "#fbbf24"
+      color: "#fcd34d"
     }
   };
 
@@ -72,14 +72,14 @@ export function ForecastTimeline() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-[#0f141f] border border-cyan-500/40 rounded p-2.5 shadow-xl text-xs font-mono-tech text-white space-y-1">
-          <div className="text-cyan-400 font-bold border-b border-white/[0.08] pb-1 flex items-center justify-between">
+        <div className="bg-[#101520] border border-white/10 rounded p-2.5 shadow-xl text-xs font-mono-tech text-white space-y-1">
+          <div className="text-slate-300 font-semibold border-b border-white/[0.06] pb-1 flex items-center justify-between">
             <span>LEAD: {label}</span>
-            <span className="text-[10px] text-slate-400">CAPTION: {selectedLocation.name}</span>
+            <span className="text-[10px] text-slate-400">STATION: {selectedLocation.name}</span>
           </div>
           <div className="text-white flex items-center justify-between gap-4">
-            <span className="text-cyan-300 font-bold">★ HYBRID FORECAST:</span>
-            <span className="font-bold text-sm">
+            <span className="text-slate-200 font-medium">★ HYBRID FORECAST:</span>
+            <span className="font-semibold text-sm">
               {data[currentCfg.hybridKey]} {currentCfg.unit}
             </span>
           </div>
@@ -90,15 +90,15 @@ export function ForecastTimeline() {
           )}
           {showComponents && (
             <div className="pt-1 border-t border-white/[0.05] space-y-0.5 text-[11px] text-slate-300">
-              <div className="flex justify-between text-sky-400">
+              <div className="flex justify-between text-slate-300">
                 <span>NWP Model:</span>
                 <span>{data.nwp ? data.nwp[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
               </div>
-              <div className="flex justify-between text-emerald-400">
+              <div className="flex justify-between text-emerald-300/80">
                 <span>AI Model A (FuXi):</span>
                 <span>{data.aiA ? data.aiA[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
               </div>
-              <div className="flex justify-between text-amber-400">
+              <div className="flex justify-between text-amber-300/80">
                 <span>AI Model B (WeatherNext):</span>
                 <span>{data.aiB ? data.aiB[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
               </div>
@@ -111,18 +111,18 @@ export function ForecastTimeline() {
   };
 
   return (
-    <div className="bg-[#111622] border border-white/[0.08] rounded-lg p-4 sm:p-5 relative">
+    <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-4 sm:p-5 relative">
       
       {/* Chart Controls Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-cyan-400" />
-            <h3 className="font-heading font-bold text-base text-white tracking-wide">
+            <TrendingUp className="w-4 h-4 text-slate-300" />
+            <h3 className="font-heading font-semibold text-base text-white tracking-wide">
               MULTI-MODEL FORECAST TIMELINE
             </h3>
             {isMockMode && (
-              <span className="text-[10px] font-mono-tech uppercase px-1.5 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-500/30">
+              <span className="text-[10px] font-mono-tech uppercase px-1.5 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/10">
                 ILLUSTRATIVE DEMO
               </span>
             )}
@@ -142,7 +142,7 @@ export function ForecastTimeline() {
                 onClick={() => setForecastHorizon(h.id)}
                 className={`px-2.5 py-1 rounded text-xs font-mono-tech transition-colors cursor-pointer ${
                   forecastHorizon === h.id
-                    ? "bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40"
+                    ? "bg-white/[0.08] text-slate-100 font-medium border border-white/15"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -156,7 +156,7 @@ export function ForecastTimeline() {
             onClick={() => setShowComponents(!showComponents)}
             className={`px-2.5 py-1 rounded text-xs font-mono-tech border transition-colors cursor-pointer ${
               showComponents
-                ? "bg-white/[0.06] text-slate-200 border-white/[0.15]"
+                ? "bg-white/[0.06] text-slate-200 border-white/[0.12]"
                 : "bg-transparent text-slate-500 border-white/[0.05]"
             }`}
           >
@@ -181,8 +181,8 @@ export function ForecastTimeline() {
               onClick={() => setActiveMetric(tab.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded transition-all shrink-0 cursor-pointer ${
                 isActive
-                  ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold"
-                  : "bg-[#161d2d] text-slate-400 hover:text-white border border-white/[0.04]"
+                  ? "bg-white/[0.08] text-slate-100 border border-white/15 font-medium"
+                  : "bg-[#141a27] text-slate-400 hover:text-white border border-white/[0.04]"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -198,12 +198,12 @@ export function ForecastTimeline() {
           <ComposedChart data={timelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="hybridGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="#7dd3fc" stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#7dd3fc" stopOpacity={0.0} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
             <XAxis 
               dataKey="time" 
               stroke="#64748b" 
@@ -226,8 +226,8 @@ export function ForecastTimeline() {
                 type="monotone"
                 dataKey="tempUpper"
                 stroke="transparent"
-                fill="#38bdf8"
-                fillOpacity={0.08}
+                fill="#7dd3fc"
+                fillOpacity={0.05}
                 name="90% Confidence Interval"
               />
             )}
@@ -249,7 +249,7 @@ export function ForecastTimeline() {
                   type="monotone"
                   dataKey="aiA.temp"
                   name="AI Model A (FuXi)"
-                  stroke="#34d399"
+                  stroke="#6ee7b7"
                   strokeWidth={1.5}
                   strokeDasharray="3 3"
                   dot={false}
@@ -259,7 +259,7 @@ export function ForecastTimeline() {
                   type="monotone"
                   dataKey="aiB.temp"
                   name="AI Model B (WeatherNext)"
-                  stroke="#fbbf24"
+                  stroke="#fcd34d"
                   strokeWidth={1.5}
                   strokeDasharray="2 2"
                   dot={false}
@@ -272,12 +272,12 @@ export function ForecastTimeline() {
             <Area
               type="monotone"
               dataKey={currentCfg.hybridKey}
-              stroke="#38bdf8"
-              strokeWidth={3}
+              stroke="#7dd3fc"
+              strokeWidth={2.5}
               fill="url(#hybridGradient)"
               name="ALGORIOT Hybrid"
-              dot={{ r: 3, fill: "#38bdf8", stroke: "#0b0e14", strokeWidth: 1.5 }}
-              activeDot={{ r: 6, fill: "#38bdf8", stroke: "#fff", strokeWidth: 2 }}
+              dot={{ r: 2.5, fill: "#7dd3fc", stroke: "#0b0e14", strokeWidth: 1.5 }}
+              activeDot={{ r: 5, fill: "#7dd3fc", stroke: "#e2e8f0", strokeWidth: 1.5 }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -287,8 +287,8 @@ export function ForecastTimeline() {
       <div className="mt-3 pt-3 border-t border-white/[0.05] flex flex-wrap items-center justify-between text-[11px] font-mono-tech text-slate-400 gap-2">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-1 bg-cyan-400 rounded-full" />
-            <span className="text-white font-semibold">ALGORIOT Hybrid (Blended)</span>
+            <span className="w-3 h-1 bg-[#7dd3fc] rounded-full" />
+            <span className="text-white font-medium">ALGORIOT Hybrid (Blended)</span>
           </div>
           {showComponents && (
             <>
@@ -297,11 +297,11 @@ export function ForecastTimeline() {
                 <span className="text-slate-300">NWP Model</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-emerald-400 border-b border-dashed" />
+                <span className="w-3 h-0.5 bg-emerald-400/80 border-b border-dashed" />
                 <span className="text-slate-300">AI Model A</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-amber-400 border-b border-dashed" />
+                <span className="w-3 h-0.5 bg-amber-400/80 border-b border-dashed" />
                 <span className="text-slate-300">AI Model B</span>
               </div>
             </>

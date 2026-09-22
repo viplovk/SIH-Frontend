@@ -14,8 +14,8 @@ export function Uncertainty() {
       <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Compass className="w-5 h-5 text-cyan-400" />
-            <h1 className="text-2xl font-heading font-bold text-white tracking-wide">
+            <Compass className="w-5 h-5 text-slate-300" />
+            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
               FORECAST UNCERTAINTY & CONFORMAL CALIBRATION
             </h1>
           </div>
@@ -26,9 +26,9 @@ export function Uncertainty() {
 
         <button
           onClick={openExplainModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-xs font-mono-tech hover:bg-cyan-500/30 transition-colors self-start md:self-auto cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.08] text-slate-100 border border-white/15 text-xs font-mono-tech hover:bg-white/[0.12] transition-colors self-start md:self-auto cursor-pointer font-medium"
         >
-          <HelpCircle className="w-3.5 h-3.5" />
+          <HelpCircle className="w-3.5 h-3.5 text-slate-300" />
           <span>Audit Confidence Math</span>
         </button>
       </div>

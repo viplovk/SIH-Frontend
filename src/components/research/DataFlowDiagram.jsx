@@ -149,12 +149,12 @@ export function DataFlowDiagram() {
     <div ref={diagramRef} className="space-y-6">
       
       {/* Introduction Card */}
-      <div className="bg-[#111622] border border-white/[0.08] rounded-lg p-5">
+      <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-white/[0.06] gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-xl font-heading font-bold text-white tracking-wide">
+              <BookOpen className="w-5 h-5 text-slate-300" />
+              <h2 className="text-xl font-heading font-semibold text-white tracking-wide">
                 HYBRID SCIENTIFIC ARCHITECTURE
               </h2>
             </div>
@@ -163,7 +163,7 @@ export function DataFlowDiagram() {
             </p>
           </div>
 
-          <span className="text-xs font-mono-tech text-cyan-300 bg-cyan-950/40 px-2.5 py-1 rounded border border-cyan-500/30">
+          <span className="text-xs font-mono-tech text-slate-300 bg-white/[0.04] px-2.5 py-1 rounded border border-white/10">
             CLICK ANY STAGE TO INSPECT ALGORITHMS
           </span>
         </div>
@@ -187,18 +187,18 @@ export function DataFlowDiagram() {
                 onClick={() => setSelectedStage(stg.id)}
                 className={`pipeline-step cursor-pointer p-3 rounded-lg border transition-all flex items-center justify-between ${
                   isSelected
-                    ? "bg-cyan-500/15 border-cyan-500/50 shadow-[0_0_15px_rgba(56,189,248,0.15)] ring-1 ring-cyan-500/30"
-                    : "bg-[#111622] border-white/[0.06] hover:bg-[#141b2a]"
+                    ? "bg-white/[0.08] border-white/20 ring-1 ring-white/10"
+                    : "bg-[#101520] border-white/[0.06] hover:bg-[#141b2a]"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-7 h-7 rounded flex items-center justify-center font-mono-tech text-xs font-bold ${
-                    isSelected ? "bg-cyan-400 text-slate-950" : "bg-black/40 text-slate-400 border border-white/10"
+                  <div className={`w-7 h-7 rounded flex items-center justify-center font-mono-tech text-xs font-semibold ${
+                    isSelected ? "bg-slate-200 text-slate-900" : "bg-black/40 text-slate-400 border border-white/10"
                   }`}>
                     {stg.id + 1}
                   </div>
                   <div>
-                    <div className="text-xs font-heading font-bold text-white tracking-wide">
+                    <div className="text-xs font-heading font-semibold text-white tracking-wide">
                       {stg.title}
                     </div>
                     <div className="text-[10px] font-mono-tech text-slate-400">
@@ -211,7 +211,7 @@ export function DataFlowDiagram() {
                   <span className="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-white/[0.04] text-slate-300 hidden sm:inline">
                     {stg.badge}
                   </span>
-                  <ChevronRight className={`w-4 h-4 ${isSelected ? "text-cyan-400" : "text-slate-600"}`} />
+                  <ChevronRight className={`w-4 h-4 ${isSelected ? "text-slate-300" : "text-slate-600"}`} />
                 </div>
               </div>
             );
@@ -220,19 +220,19 @@ export function DataFlowDiagram() {
 
         {/* Right Side: Deep Inspection Panel (6 cols) */}
         <div className="lg:col-span-6">
-          <div className="sticky top-20 bg-[#111622] border border-cyan-500/30 rounded-lg p-5 shadow-2xl space-y-4">
+          <div className="sticky top-20 bg-[#101520] border border-white/10 rounded-lg p-5 space-y-4">
             
             {/* Header */}
             <div className="border-b border-white/[0.08] pb-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-mono-tech text-cyan-400 font-bold uppercase tracking-wider">
+                <span className="text-xs font-mono-tech text-slate-300 font-semibold uppercase tracking-wider">
                   STAGE 0{current.id + 1} DEEP INSPECTION
                 </span>
-                <span className="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[10px] font-mono-tech">
+                <span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 text-slate-300 text-[10px] font-mono-tech">
                   {current.badge}
                 </span>
               </div>
-              <h3 className="text-lg font-heading font-bold text-white">
+              <h3 className="text-lg font-heading font-semibold text-white">
                 {current.title}
               </h3>
               <p className="text-xs text-slate-400 font-mono-tech mt-0.5">
@@ -243,7 +243,7 @@ export function DataFlowDiagram() {
             {/* Mathematical Formulation */}
             <div className="bg-[#0b0e14] border border-white/[0.08] rounded p-3 font-mono-tech text-xs">
               <span className="text-[10px] uppercase text-slate-500 block mb-1">Mathematical Formulation:</span>
-              <code className="text-cyan-300 font-semibold leading-relaxed block overflow-x-auto py-1">
+              <code className="text-slate-200 font-semibold leading-relaxed block overflow-x-auto py-1">
                 {current.math}
               </code>
             </div>
@@ -260,19 +260,19 @@ export function DataFlowDiagram() {
 
             {/* Inputs & Outputs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/[0.06] text-xs font-mono-tech">
-              <div className="bg-[#161d2d] p-2.5 rounded">
+              <div className="bg-[#141a27] p-2.5 rounded border border-white/[0.04]">
                 <span className="text-[10px] text-slate-500 uppercase block mb-0.5">Stage Inputs:</span>
                 <span className="text-slate-200">{current.inputs}</span>
               </div>
-              <div className="bg-[#161d2d] p-2.5 rounded">
+              <div className="bg-[#141a27] p-2.5 rounded border border-white/[0.04]">
                 <span className="text-[10px] text-slate-500 uppercase block mb-0.5">Stage Outputs:</span>
-                <span className="text-emerald-400 font-semibold">{current.outputs}</span>
+                <span className="text-emerald-300/90 font-medium">{current.outputs}</span>
               </div>
             </div>
 
             {/* Research Justification */}
-            <div className="p-3 bg-cyan-950/20 border border-cyan-500/20 rounded text-xs text-slate-300 font-sans">
-              <strong className="text-cyan-300 font-mono-tech">SIH 2026 Problem Solver: </strong>
+            <div className="p-3 bg-white/[0.03] border border-white/[0.06] rounded text-xs text-slate-300 font-sans">
+              <strong className="text-slate-200 font-mono-tech">SIH 2026 Problem Solver: </strong>
               Directly resolves the static weighting flaw where traditional models fail under rapid monsoon convection or extreme heatwave subsidence.
             </div>
 
@@ -282,8 +282,8 @@ export function DataFlowDiagram() {
       </div>
 
       {/* Scientific Research References Section */}
-      <div className="bg-[#111622] border border-white/[0.08] rounded-lg p-5">
-        <h3 className="text-base font-heading font-bold text-white mb-2">
+      <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-5">
+        <h3 className="text-base font-heading font-semibold text-white mb-2">
           FOUNDATIONAL METEOROLOGICAL & AI REFERENCES
         </h3>
         <p className="text-xs text-slate-400 font-mono-tech mb-4">
@@ -292,40 +292,40 @@ export function DataFlowDiagram() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-sans">
           
-          <div className="bg-[#161d2d] border border-white/[0.04] p-3 rounded">
+          <div className="bg-[#141a27] border border-white/[0.04] p-3 rounded">
             <div className="flex items-baseline justify-between mb-1">
-              <h5 className="font-bold text-white">FuXi: Medium-Range Global Weather Forecasting</h5>
-              <span className="text-[10px] font-mono-tech text-cyan-400">NPJ Climate 2023</span>
+              <h5 className="font-semibold text-white">FuXi: Medium-Range Global Weather Forecasting</h5>
+              <span className="text-[10px] font-mono-tech text-slate-400">NPJ Climate 2023</span>
             </div>
             <p className="text-slate-400 text-xs">
               Cascade machine learning architecture utilizing 15-day multi-stage autoregressive models, adapted in Algoriot for rapid short-range convective rain echo detection.
             </p>
           </div>
 
-          <div className="bg-[#161d2d] border border-white/[0.04] p-3 rounded">
+          <div className="bg-[#141a27] border border-white/[0.04] p-3 rounded">
             <div className="flex items-baseline justify-between mb-1">
-              <h5 className="font-bold text-white">AICON: Artificial Intelligence for Convective Onset</h5>
-              <span className="text-[10px] font-mono-tech text-cyan-400">BAMS 2024</span>
+              <h5 className="font-semibold text-white">AICON: Artificial Intelligence for Convective Onset</h5>
+              <span className="text-[10px] font-mono-tech text-slate-400">BAMS 2024</span>
             </div>
             <p className="text-slate-400 text-xs">
               Physics-guided neural network architecture providing regime classification for lightning and severe convective storm squall lines.
             </p>
           </div>
 
-          <div className="bg-[#161d2d] border border-white/[0.04] p-3 rounded">
+          <div className="bg-[#141a27] border border-white/[0.04] p-3 rounded">
             <div className="flex items-baseline justify-between mb-1">
-              <h5 className="font-bold text-white">WeatherNext: Multi-Scale Earth Attention</h5>
-              <span className="text-[10px] font-mono-tech text-cyan-400">IEEE TGRS 2024</span>
+              <h5 className="font-semibold text-white">WeatherNext: Multi-Scale Earth Attention</h5>
+              <span className="text-[10px] font-mono-tech text-slate-400">IEEE TGRS 2024</span>
             </div>
             <p className="text-slate-400 text-xs">
               Hierarchical 3D spherical vision transformer capturing global baroclinic wave teleconnections across upper tropospheric pressure levels (500hPa & 200hPa).
             </p>
           </div>
 
-          <div className="bg-[#161d2d] border border-white/[0.04] p-3 rounded">
+          <div className="bg-[#141a27] border border-white/[0.04] p-3 rounded">
             <div className="flex items-baseline justify-between mb-1">
-              <h5 className="font-bold text-white">Multi-Source ML for Drought & Heatwave Prediction</h5>
-              <span className="text-[10px] font-mono-tech text-cyan-400">Journal of Hydrology 2024</span>
+              <h5 className="font-semibold text-white">Multi-Source ML for Drought & Heatwave Prediction</h5>
+              <span className="text-[10px] font-mono-tech text-slate-400">Journal of Hydrology 2024</span>
             </div>
             <p className="text-slate-400 text-xs">
               Synergistic coupling of land-surface moisture proxies with numerical physics to forecast agro-climatic stress and hydrological deficit.

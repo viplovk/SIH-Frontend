@@ -28,16 +28,16 @@ export function CommandHero() {
         {/* Top Technical Status Ribbon */}
         <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-white/[0.05] text-[11px] font-mono-tech text-slate-400">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-status-pulse shadow-[0_0_8px_#38bdf8]" />
-            <span className="text-white font-semibold tracking-wider">HYBRID WEATHER INTELLIGENCE</span>
+            <span className="w-2 h-2 rounded-full bg-slate-300 animate-status-pulse" />
+            <span className="text-slate-200 font-medium tracking-wider">HYBRID WEATHER INTELLIGENCE</span>
             <span className="text-white/20">•</span>
             <span className="text-slate-400">ATMOSPHERIC REGIME DETECTOR: ACTIVE</span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-slate-400">CURRENT FOCUS: <span className="text-cyan-300 font-semibold">{selectedLocation.name.toUpperCase()}, INDIA</span></span>
+            <span className="text-slate-400">CURRENT FOCUS: <span className="text-slate-200 font-medium">{selectedLocation.name.toUpperCase()}, INDIA</span></span>
             <span className="text-white/20 hidden sm:inline">•</span>
-            <span className="text-emerald-400 font-semibold hidden sm:inline">99.8% INFERENCE FIDELITY</span>
+            <span className="text-slate-300 font-medium hidden sm:inline">99.8% INFERENCE FIDELITY</span>
           </div>
         </div>
 
@@ -45,9 +45,9 @@ export function CommandHero() {
         <div ref={headlineRef} className="pt-4 pb-2 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="max-w-3xl">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-bold text-white tracking-tight leading-tight">
-              See the atmosphere <span className="text-cyan-400 font-normal">differently.</span>
+              See the atmosphere <span className="text-slate-300 font-normal">differently.</span>
             </h1>
-            <p className="mt-1.5 text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
+            <p className="mt-1.5 text-sm sm:text-base text-slate-400 font-normal leading-relaxed">
               Combining physics-based numerical weather prediction with AI-driven atmospheric modeling through regime-aware dynamic blending.
             </p>
           </div>
@@ -56,15 +56,15 @@ export function CommandHero() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={openExplainModal}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-mono-tech transition-all shadow-[0_0_15px_rgba(56,189,248,0.1)] cursor-pointer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded bg-white/[0.05] hover:bg-white/[0.09] text-slate-200 border border-white/10 text-xs font-mono-tech transition-all cursor-pointer"
             >
-              <Zap className="w-3.5 h-3.5 text-cyan-400" />
+              <Zap className="w-3.5 h-3.5 text-slate-400" />
               <span>Explain Model Weights</span>
             </button>
 
             <Link
               to="/research"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08] text-xs font-mono-tech transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded bg-white/[0.03] hover:bg-white/[0.06] text-slate-300 border border-white/[0.08] text-xs font-mono-tech transition-colors"
             >
               <span>Methodology</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
