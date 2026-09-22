@@ -4,14 +4,12 @@ import {
   ComposedChart, 
   Line, 
   Area, 
-  Bar, 
   XAxis, 
   YAxis, 
   Tooltip, 
-  Legend, 
   CartesianGrid 
 } from "recharts";
-import { Clock, TrendingUp, Thermometer, CloudRain, Wind, Droplets, Sliders } from "lucide-react";
+import { TrendingUp, Thermometer, CloudRain, Wind, Droplets } from "lucide-react";
 import { useWeather } from "../../context/WeatherContext.jsx";
 import { generateTimelineData, FORECAST_HORIZONS } from "../../data/mockForecast.js";
 
@@ -27,80 +25,68 @@ export function ForecastTimeline() {
       label: "Temperature (°C)",
       unit: "°C",
       hybridKey: "temperature",
-      nwpKey: "nwp.temp",
-      aiAKey: "aiA.temp",
-      aiBKey: "aiB.temp",
       yDomain: ["auto", "auto"],
-      color: "#7dd3fc"
+      color: "#0b3d91"
     },
     precipitation: {
       label: "Precipitation (mm / h)",
       unit: "mm",
       hybridKey: "precipitation",
-      nwpKey: "nwp.precip",
-      aiAKey: "aiA.precip",
-      aiBKey: "aiB.precip",
       yDomain: [0, "auto"],
-      color: "#6ee7b7"
+      color: "#0284c7"
     },
     wind: {
       label: "Wind Velocity (km/h)",
       unit: "km/h",
       hybridKey: "wind",
-      nwpKey: "nwp.wind",
-      aiAKey: "aiA.wind",
-      aiBKey: "aiB.wind",
       yDomain: [0, "auto"],
-      color: "#a5b4fc"
+      color: "#4f46e5"
     },
     humidity: {
       label: "Relative Humidity (%)",
       unit: "%",
       hybridKey: "humidity",
-      nwpKey: "nwp.humid",
-      aiAKey: "aiA.humid",
-      aiBKey: "aiB.humid",
       yDomain: [0, 100],
-      color: "#fcd34d"
+      color: "#059669"
     }
   };
 
   const currentCfg = metricConfigs[activeMetric];
 
-  // Custom tooltips with dark command center aesthetic
+  // Custom tooltips with clean scientific institutional card
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-[#101520] border border-white/10 rounded p-2.5 shadow-xl text-xs font-mono-tech text-white space-y-1">
-          <div className="text-slate-300 font-semibold border-b border-white/[0.06] pb-1 flex items-center justify-between">
-            <span>LEAD: {label}</span>
-            <span className="text-[10px] text-slate-400">STATION: {selectedLocation.name}</span>
+        <div className="bg-white border border-slate-300 rounded-md p-3 shadow-md text-xs text-slate-800 space-y-1.5 min-w-[200px]">
+          <div className="text-slate-900 font-bold border-b border-slate-200 pb-1 flex items-center justify-between">
+            <span className="uppercase text-[11px] text-[#0b3d91]">LEAD: {label}</span>
+            <span className="text-[10px] text-slate-500">{selectedLocation.name}</span>
           </div>
-          <div className="text-white flex items-center justify-between gap-4">
-            <span className="text-slate-200 font-medium">★ HYBRID FORECAST:</span>
-            <span className="font-semibold text-sm">
+          <div className="flex items-center justify-between text-slate-900 font-bold text-sm">
+            <span>Hybrid Forecast:</span>
+            <span className="text-[#0b3d91]">
               {data[currentCfg.hybridKey]} {currentCfg.unit}
             </span>
           </div>
           {data.tempLower && activeMetric === "temperature" && (
-            <div className="text-[11px] text-slate-400">
+            <div className="text-[11px] text-slate-500 font-mono-tech">
               90% Range: {data.tempLower}°C — {data.tempUpper}°C
             </div>
           )}
           {showComponents && (
-            <div className="pt-1 border-t border-white/[0.05] space-y-0.5 text-[11px] text-slate-300">
-              <div className="flex justify-between text-slate-300">
-                <span>NWP Model:</span>
-                <span>{data.nwp ? data.nwp[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
+            <div className="pt-1.5 border-t border-slate-200 space-y-1 text-[11px]">
+              <div className="flex justify-between text-slate-600">
+                <span>NWP Physics:</span>
+                <span className="font-semibold text-slate-800">{data.nwp ? data.nwp[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
               </div>
-              <div className="flex justify-between text-emerald-300/80">
+              <div className="flex justify-between text-emerald-700">
                 <span>AI Model A (FuXi):</span>
-                <span>{data.aiA ? data.aiA[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
+                <span className="font-semibold">{data.aiA ? data.aiA[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
               </div>
-              <div className="flex justify-between text-amber-300/80">
+              <div className="flex justify-between text-amber-700">
                 <span>AI Model B (WeatherNext):</span>
-                <span>{data.aiB ? data.aiB[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
+                <span className="font-semibold">{data.aiB ? data.aiB[activeMetric === "temperature" ? "temp" : activeMetric === "precipitation" ? "precip" : activeMetric] : "--"} {currentCfg.unit}</span>
               </div>
             </div>
           )}
@@ -111,39 +97,35 @@ export function ForecastTimeline() {
   };
 
   return (
-    <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-4 sm:p-5 relative">
+    <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-xs">
       
       {/* Chart Controls Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-5 mb-6 border-b border-slate-200 gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-slate-300" />
-            <h3 className="font-heading font-semibold text-base text-white tracking-wide">
-              MULTI-MODEL FORECAST TIMELINE
-            </h3>
-            {isMockMode && (
-              <span className="text-[10px] font-mono-tech uppercase px-1.5 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/10">
-                ILLUSTRATIVE DEMO
-              </span>
-            )}
+          <div className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#0b3d91]" />
+            <span>Multi-Model Trajectory</span>
           </div>
-          <p className="text-[11px] text-slate-400 font-mono-tech mt-0.5">
-            Synchronized comparison between physics NWP, AI Model A, AI Model B, and blended Hybrid
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            MULTI-MODEL FORECAST TIMELINE
+          </h2>
+          <p className="text-sm text-slate-600 mt-1">
+            Synchronized comparison between physics NWP, AI Model A, AI Model B, and blended Hybrid.
           </p>
         </div>
 
         {/* Horizon and Variable Selectors */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Horizon Pills */}
-          <div className="flex items-center bg-[#0d121a] p-0.5 rounded border border-white/[0.06]">
+          {/* Horizon Selectors */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-md border border-slate-200">
             {FORECAST_HORIZONS.map((h) => (
               <button
                 key={h.id}
                 onClick={() => setForecastHorizon(h.id)}
-                className={`px-2.5 py-1 rounded text-xs font-mono-tech transition-colors cursor-pointer ${
+                className={`px-3 py-1 rounded text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
                   forecastHorizon === h.id
-                    ? "bg-white/[0.08] text-slate-100 font-medium border border-white/15"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-white text-slate-900 shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 {h.label}
@@ -154,19 +136,19 @@ export function ForecastTimeline() {
           {/* Toggle sub-model curves */}
           <button
             onClick={() => setShowComponents(!showComponents)}
-            className={`px-2.5 py-1 rounded text-xs font-mono-tech border transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded text-xs font-semibold border transition-colors cursor-pointer ${
               showComponents
-                ? "bg-white/[0.06] text-slate-200 border-white/[0.12]"
-                : "bg-transparent text-slate-500 border-white/[0.05]"
+                ? "bg-slate-100 text-slate-900 border-slate-300"
+                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
             }`}
           >
-            {showComponents ? "Sub-models: Shown" : "Sub-models: Hidden"}
+            {showComponents ? "Sub-models: Visible" : "Sub-models: Hidden"}
           </button>
         </div>
       </div>
 
       {/* Variable Switch Tabs */}
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1 text-xs font-mono-tech">
+      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 text-xs">
         {[
           { id: "temperature", label: "Temperature", icon: Thermometer },
           { id: "precipitation", label: "Precipitation", icon: CloudRain },
@@ -179,13 +161,13 @@ export function ForecastTimeline() {
             <button
               key={tab.id}
               onClick={() => setActiveMetric(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded text-xs font-semibold transition-colors shrink-0 cursor-pointer ${
                 isActive
-                  ? "bg-white/[0.08] text-slate-100 border border-white/15 font-medium"
-                  : "bg-[#141a27] text-slate-400 hover:text-white border border-white/[0.04]"
+                  ? "bg-[#0b3d91] text-white shadow-2xs"
+                  : "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200"
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
             </button>
           );
@@ -193,41 +175,42 @@ export function ForecastTimeline() {
       </div>
 
       {/* Main Chart */}
-      <div className="h-72 w-full">
+      <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={timelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+          <ComposedChart data={timelineData} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
             <defs>
-              <linearGradient id="hybridGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7dd3fc" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#7dd3fc" stopOpacity={0.0} />
+              <linearGradient id="hybridSoftGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#0b3d91" stopOpacity={0.12} />
+                <stop offset="95%" stopColor="#0b3d91" stopOpacity={0.0} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+            {/* Subtle slate-200 gridlines */}
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis 
               dataKey="time" 
               stroke="#64748b" 
               fontSize={11} 
               tickLine={false} 
-              fontFamily="IBM Plex Mono" 
+              fontFamily="monospace" 
             />
             <YAxis 
               stroke="#64748b" 
               fontSize={11} 
               tickLine={false} 
-              fontFamily="IBM Plex Mono" 
+              fontFamily="monospace" 
               domain={currentCfg.yDomain}
             />
             <Tooltip content={<CustomTooltip />} />
 
-            {/* Uncertainty envelope if temperature */}
+            {/* Confidence Interval Band (Soft shaded area, NOT neon glow) */}
             {activeMetric === "temperature" && (
               <Area
                 type="monotone"
                 dataKey="tempUpper"
                 stroke="transparent"
-                fill="#7dd3fc"
-                fillOpacity={0.05}
+                fill="#0b3d91"
+                fillOpacity={0.06}
                 name="90% Confidence Interval"
               />
             )}
@@ -238,8 +221,8 @@ export function ForecastTimeline() {
                 <Line
                   type="monotone"
                   dataKey="nwp.temp"
-                  name="NWP Baseline"
-                  stroke="#94a3b8"
+                  name="NWP Physics"
+                  stroke="#64748b"
                   strokeWidth={1.5}
                   strokeDasharray="4 4"
                   dot={false}
@@ -249,7 +232,7 @@ export function ForecastTimeline() {
                   type="monotone"
                   dataKey="aiA.temp"
                   name="AI Model A (FuXi)"
-                  stroke="#6ee7b7"
+                  stroke="#059669"
                   strokeWidth={1.5}
                   strokeDasharray="3 3"
                   dot={false}
@@ -259,7 +242,7 @@ export function ForecastTimeline() {
                   type="monotone"
                   dataKey="aiB.temp"
                   name="AI Model B (WeatherNext)"
-                  stroke="#fcd34d"
+                  stroke="#d97706"
                   strokeWidth={1.5}
                   strokeDasharray="2 2"
                   dot={false}
@@ -272,43 +255,43 @@ export function ForecastTimeline() {
             <Area
               type="monotone"
               dataKey={currentCfg.hybridKey}
-              stroke="#7dd3fc"
+              stroke="#0b3d91"
               strokeWidth={2.5}
-              fill="url(#hybridGradient)"
+              fill="url(#hybridSoftGrad)"
               name="ALGORIOT Hybrid"
-              dot={{ r: 2.5, fill: "#7dd3fc", stroke: "#0b0e14", strokeWidth: 1.5 }}
-              activeDot={{ r: 5, fill: "#7dd3fc", stroke: "#e2e8f0", strokeWidth: 1.5 }}
+              dot={{ r: 3, fill: "#0b3d91", stroke: "#ffffff", strokeWidth: 1.5 }}
+              activeDot={{ r: 5, fill: "#0b3d91", stroke: "#ffffff", strokeWidth: 2 }}
             />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Legend & Note */}
-      <div className="mt-3 pt-3 border-t border-white/[0.05] flex flex-wrap items-center justify-between text-[11px] font-mono-tech text-slate-400 gap-2">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-1 bg-[#7dd3fc] rounded-full" />
-            <span className="text-white font-medium">ALGORIOT Hybrid (Blended)</span>
+      {/* Institutional Legend */}
+      <div className="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-3">
+        <div className="flex flex-wrap items-center gap-5">
+          <div className="flex items-center gap-2">
+            <span className="w-3.5 h-1 bg-[#0b3d91] rounded-full" />
+            <strong className="text-slate-900">ALGORIOT Hybrid (Blended)</strong>
           </div>
           {showComponents && (
             <>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-slate-400 border-b border-dashed" />
-                <span className="text-slate-300">NWP Model</span>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-0.5 bg-slate-500 border-b border-dashed" />
+                <span>NWP Physics (IFS/GFS)</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-emerald-400/80 border-b border-dashed" />
-                <span className="text-slate-300">AI Model A</span>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-0.5 bg-emerald-600 border-b border-dashed" />
+                <span>AI Model A (FuXi)</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-0.5 bg-amber-400/80 border-b border-dashed" />
-                <span className="text-slate-300">AI Model B</span>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-0.5 bg-amber-600 border-b border-dashed" />
+                <span>AI Model B (WeatherNext)</span>
               </div>
             </>
           )}
         </div>
 
-        <div className="text-slate-500">
+        <div className="text-slate-500 font-mono-tech text-[11px]">
           Evaluated via Conformal Quantile Meta-Learner
         </div>
       </div>

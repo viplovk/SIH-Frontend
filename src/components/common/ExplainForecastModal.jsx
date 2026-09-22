@@ -60,30 +60,30 @@ export function ExplainForecastModal() {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
       <div 
         ref={modalRef}
-        className="bg-[#101521] border border-cyan-500/30 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative p-5 sm:p-6"
+        className="bg-white border border-slate-200 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl relative p-6 sm:p-7"
       >
         
         {/* Top Header */}
-        <div className="flex items-start justify-between border-b border-white/[0.08] pb-4 mb-4">
+        <div className="flex items-start justify-between border-b border-slate-200 pb-4 mb-5">
           <div>
-            <div className="flex items-center gap-2 text-cyan-400 font-mono-tech text-xs uppercase tracking-wider mb-1">
-              <Activity className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1.5 text-[#0b3d91] text-xs font-bold uppercase tracking-wider mb-1">
+              <Activity className="w-4 h-4 text-[#0b3d91]" />
               <span>ALGORITHMIC EXPLAINABILITY MODULE</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-heading font-bold text-white tracking-wide">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
               Why this Forecast?
             </h2>
-            <p className="text-xs text-slate-400 font-mono-tech mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Auditing dynamic weights for {selectedLocation.name}, India ({selectedLocation.lat}°N / {selectedLocation.lon}°E)
             </p>
           </div>
 
           <button
             onClick={closeExplainModal}
-            className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -91,28 +91,28 @@ export function ExplainForecastModal() {
         </div>
 
         {/* Dynamic Model Contribution Highlight */}
-        <div className="bg-[#161d2d] border border-cyan-500/20 rounded-lg p-4 mb-5">
-          <div className="text-[11px] font-mono-tech text-cyan-400 uppercase tracking-wider mb-2 font-semibold">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-5">
+          <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
             DYNAMIC MODEL CONTRIBUTION BREAKDOWN
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5 text-center">
-            <div className="bg-[#0f141f] p-3 rounded border border-sky-500/30">
-              <div className="text-2xl font-heading font-bold text-sky-400">{weights.nwp}%</div>
-              <div className="text-[11px] font-mono-tech font-bold text-slate-300">NWP MODEL</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">Physics & Conservation</div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="bg-white p-3.5 rounded-md border border-slate-200 shadow-2xs">
+              <div className="text-2xl font-extrabold text-[#0b3d91]">{weights.nwp}%</div>
+              <div className="text-xs font-bold text-slate-800 mt-0.5">NWP MODEL</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">Physics & Conservation</div>
             </div>
 
-            <div className="bg-[#0f141f] p-3 rounded border border-emerald-500/30">
-              <div className="text-2xl font-heading font-bold text-emerald-400">{weights.aiA}%</div>
-              <div className="text-[11px] font-mono-tech font-bold text-slate-300">AI MODEL A</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">FuXi / Micro-gradients</div>
+            <div className="bg-white p-3.5 rounded-md border border-slate-200 shadow-2xs">
+              <div className="text-2xl font-extrabold text-teal-700">{weights.aiA}%</div>
+              <div className="text-xs font-bold text-slate-800 mt-0.5">AI MODEL A</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">FuXi / Micro-gradients</div>
             </div>
 
-            <div className="bg-[#0f141f] p-3 rounded border border-amber-500/30">
-              <div className="text-2xl font-heading font-bold text-amber-400">{weights.aiB}%</div>
-              <div className="text-[11px] font-mono-tech font-bold text-slate-300">AI MODEL B</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">WeatherNext / Pangu</div>
+            <div className="bg-white p-3.5 rounded-md border border-slate-200 shadow-2xs">
+              <div className="text-2xl font-extrabold text-amber-700">{weights.aiB}%</div>
+              <div className="text-xs font-bold text-slate-800 mt-0.5">AI MODEL B</div>
+              <div className="text-[11px] text-slate-500 mt-0.5">WeatherNext / Pangu</div>
             </div>
           </div>
         </div>
@@ -124,16 +124,16 @@ export function ExplainForecastModal() {
           </div>
 
           {explainPoints.map((pt) => (
-            <div key={pt.num} className="bg-[#141a27] border border-white/[0.04] rounded-lg p-3 hover:border-cyan-500/30 transition-all">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-mono-tech text-cyan-400 font-bold">
+            <div key={pt.num} className="bg-white border border-slate-200 rounded-lg p-3.5 hover:border-slate-300 transition-all shadow-2xs">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-bold text-[#0b3d91]">
                   {pt.num}. {pt.title}
                 </span>
-                <span className="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-white/[0.05] text-slate-300">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
                   {pt.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 {pt.description}
               </p>
             </div>
@@ -141,13 +141,13 @@ export function ExplainForecastModal() {
         </div>
 
         {/* Footer info & close */}
-        <div className="flex items-center justify-between pt-3 border-t border-white/[0.08] text-xs font-mono-tech">
-          <span className="text-slate-400">
+        <div className="flex items-center justify-between pt-4 border-t border-slate-200 text-xs">
+          <span className="text-slate-500 font-medium">
             Smart India Hackathon 2026 • SIH26081
           </span>
           <button
             onClick={closeExplainModal}
-            className="px-4 py-2 rounded bg-cyan-400 text-slate-950 font-bold hover:bg-cyan-300 transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-md bg-[#0b3d91] hover:bg-[#082a66] text-white font-semibold transition-colors cursor-pointer shadow-xs"
           >
             Acknowledge & Close
           </button>

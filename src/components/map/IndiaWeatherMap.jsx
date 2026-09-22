@@ -4,15 +4,11 @@ import {
   Play, 
   Pause, 
   RotateCcw, 
-  Layers, 
   MapPin, 
   Radio, 
-  Maximize2, 
   Info, 
   Compass,
-  AlertTriangle,
-  Eye,
-  Sliders
+  Layers
 } from "lucide-react";
 import { useWeather } from "../../context/WeatherContext.jsx";
 import { TIMELINE_STEPS, FORECAST_VARIABLES } from "../../data/mockForecast.js";
@@ -35,11 +31,11 @@ export function IndiaWeatherMap({ standalone = false }) {
   } = useWeather();
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showRadarSweep, setShowRadarSweep] = useState(true);
+  const [showRadarSweep, setShowRadarSweep] = useState(false);
   const [showStations, setShowStations] = useState(true);
   const [mapZoom, setMapZoom] = useState(5);
 
-  // Initialize Leaflet Map
+  // Initialize Leaflet Map with CartoDB Positron Light Tiles
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -53,13 +49,13 @@ export function IndiaWeatherMap({ standalone = false }) {
       attributionControl: false
     });
 
-    // Dark Matter tile layer for scientific meteorological command look
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    // CartoDB Positron Light Tile Layer (clean institutional cartography)
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       subdomains: "abcd",
       maxZoom: 19
     }).addTo(map);
 
-    // Zoom control at bottom right
+    // Clean Zoom Control at bottom right
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
     // Layer groups for markers and meteorological heat anomalies
@@ -86,7 +82,7 @@ export function IndiaWeatherMap({ standalone = false }) {
       mapInstanceRef.current.flyTo(
         [selectedLocation.lat, selectedLocation.lon],
         standalone ? 6 : Math.max(mapZoom, 5.5),
-        { duration: 1.2 }
+        { duration: 1.0 }
       );
     }
   }, [selectedLocation.id]);
@@ -101,8 +97,6 @@ export function IndiaWeatherMap({ standalone = false }) {
     markersGroup.clearLayers();
     overlayGroup.clearLayers();
 
-    // 1. Draw Simulated Meteorological Field Circles around locations
-    // Multiplied by timeline step index to simulate weather front movement
     const stepIdx = TIMELINE_STEPS.indexOf(timelineStep);
 
     locationsList.forEach((loc) => {
@@ -111,50 +105,47 @@ export function IndiaWeatherMap({ standalone = false }) {
 
       // Calculate dynamic value based on activeVariable and timeline step
       let val = 0;
-      let fillColor = "#38bdf8";
-      let radiusKm = 180000; // 180km
+      let fillColor = "#0284c7";
+      let radiusKm = 170000;
 
       if (activeVariable === "temperature") {
         val = base.temperature + (stepIdx * 0.4) - (loc.lat > 25 ? 1 : 0);
-        fillColor = val > 36 ? "#f43f5e" : val > 31 ? "#fbbf24" : val > 27 ? "#38bdf8" : "#818cf8";
+        fillColor = val > 36 ? "#dc2626" : val > 31 ? "#ea580c" : val > 27 ? "#0284c7" : "#4f46e5";
       } else if (activeVariable === "precipitation") {
         val = Math.max(5, base.precipitation + (stepIdx % 2 === 0 ? 10 : -5));
-        fillColor = val > 75 ? "#06b6d4" : val > 50 ? "#3b82f6" : "#64748b";
-        radiusKm = (val / 100) * 240000;
+        fillColor = val > 75 ? "#0891b2" : val > 50 ? "#2563eb" : "#94a3b8";
+        radiusKm = (val / 100) * 230000;
       } else if (activeVariable === "wind") {
         val = base.windSpeed + stepIdx * 1.5;
-        fillColor = val > 22 ? "#a855f7" : val > 15 ? "#06b6d4" : "#64748b";
+        fillColor = val > 22 ? "#7c3aed" : val > 15 ? "#0284c7" : "#64748b";
       } else if (activeVariable === "extremeRisk") {
         const hasCritical = loc.extremeAlert?.severity === "CRITICAL";
         const hasHigh = loc.extremeAlert?.severity === "HIGH";
-        fillColor = hasCritical ? "#ef4444" : hasHigh ? "#f97316" : "#eab308";
-        radiusKm = hasCritical ? 260000 : 190000;
+        fillColor = hasCritical ? "#dc2626" : hasHigh ? "#ea580c" : "#ca8a04";
+        radiusKm = hasCritical ? 250000 : 180000;
       } else if (activeVariable === "humidity") {
         val = Math.min(98, base.humidity + stepIdx * 2);
-        fillColor = val > 80 ? "#0284c7" : val > 65 ? "#38bdf8" : "#94a3b8";
-      } else {
-        fillColor = "#38bdf8";
+        fillColor = val > 80 ? "#0369a1" : val > 65 ? "#0284c7" : "#94a3b8";
       }
 
-      // Draw atmospheric field bubble
+      // Draw atmospheric field contour
       const circle = L.circle([loc.lat, loc.lon], {
-        color: isSelected ? "#38bdf8" : fillColor,
+        color: isSelected ? "#0b3d91" : fillColor,
         weight: isSelected ? 2 : 1,
-        dashArray: isSelected ? "3, 3" : undefined,
         fillColor: fillColor,
-        fillOpacity: isSelected ? 0.32 : 0.18,
+        fillOpacity: isSelected ? 0.28 : 0.16,
         radius: radiusKm
       });
       overlayGroup.addLayer(circle);
 
-      // 2. Add Station Pin Marker
+      // 2. Add Station Marker
       if (showStations) {
         const markerHtml = `
-          <div class="relative cursor-pointer group">
-            <div class="w-3.5 h-3.5 rounded-full ${isSelected ? "bg-cyan-400 ring-4 ring-cyan-500/40" : "bg-slate-300 ring-2 ring-black"} flex items-center justify-center transition-all transform hover:scale-125">
-              <div class="w-1 h-1 bg-black rounded-full"></div>
+          <div class="relative cursor-pointer">
+            <div class="w-4 h-4 rounded-full ${isSelected ? "bg-[#0b3d91] ring-3 ring-blue-300" : "bg-white ring-2 ring-slate-400"} flex items-center justify-center shadow-xs">
+              <div class="w-1.5 h-1.5 ${isSelected ? "bg-white" : "bg-slate-700"} rounded-full"></div>
             </div>
-            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#090d14] border ${isSelected ? "border-cyan-400 text-cyan-300 font-bold" : "border-white/20 text-slate-300"} px-1.5 py-0.5 rounded text-[10px] font-mono-tech whitespace-nowrap shadow-md pointer-events-none">
+            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-white border ${isSelected ? "border-[#0b3d91] text-[#0b3d91] font-bold" : "border-slate-300 text-slate-700"} px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap shadow-xs pointer-events-none">
               ${loc.name} ${activeVariable === "temperature" ? `${val.toFixed(0)}°` : ""}
             </div>
           </div>
@@ -173,25 +164,25 @@ export function IndiaWeatherMap({ standalone = false }) {
           setSelectedLocation(loc);
         });
 
-        // Popup details
+        // Clean white popup card
         marker.bindPopup(`
-          <div class="p-1 font-mono-tech text-xs">
-            <div class="font-bold text-white text-sm border-b border-white/10 pb-1 mb-1">
-              ${loc.name.toUpperCase()} RADAR HUB
+          <div class="p-1 font-sans text-xs text-slate-800">
+            <div class="font-bold text-slate-900 text-sm border-b border-slate-200 pb-1 mb-1">
+              ${loc.name} Station
             </div>
-            <div class="text-slate-300 text-[11px] mb-1">
+            <div class="text-slate-500 text-[11px] mb-1">
               ${loc.state} • ${loc.terrain}
             </div>
-            <div class="text-cyan-400 text-xs font-semibold mb-1">
+            <div class="text-[#0b3d91] text-xs font-semibold mb-1">
               Regime: ${loc.currentRegime}
             </div>
-            <div class="grid grid-cols-2 gap-1 text-[10px] bg-black/40 p-1.5 rounded mb-2">
-              <div>Temp: <strong class="text-white">${loc.baseWeather.temperature}°C</strong></div>
-              <div>Rain: <strong class="text-white">${loc.baseWeather.precipitation}%</strong></div>
-              <div>Wind: <strong class="text-white">${loc.baseWeather.windSpeed} km/h</strong></div>
-              <div>Humid: <strong class="text-white">${loc.baseWeather.humidity}%</strong></div>
+            <div class="grid grid-cols-2 gap-1.5 bg-slate-50 p-2 rounded border border-slate-200 mb-2 text-[11px]">
+              <div>Temp: <strong>${loc.baseWeather.temperature}°C</strong></div>
+              <div>Rain: <strong>${loc.baseWeather.precipitation}%</strong></div>
+              <div>Wind: <strong>${loc.baseWeather.windSpeed} km/h</strong></div>
+              <div>Humidity: <strong>${loc.baseWeather.humidity}%</strong></div>
             </div>
-            <div class="text-slate-400 text-[10px]">
+            <div class="text-slate-600 text-[10px] font-mono-tech">
               Weights: NWP ${loc.modelWeights.nwp}% | AI-A ${loc.modelWeights.aiA}% | AI-B ${loc.modelWeights.aiB}%
             </div>
           </div>
@@ -219,15 +210,15 @@ export function IndiaWeatherMap({ standalone = false }) {
   }, [isPlaying, setTimelineStep]);
 
   return (
-    <div className={`bg-[#111622] border border-white/[0.08] rounded-lg overflow-hidden flex flex-col ${standalone ? "h-[calc(100vh-140px)]" : "h-[540px] sm:h-[600px]"} relative`}>
+    <div className={`bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col ${standalone ? "h-[calc(100vh-140px)]" : "h-[540px] sm:h-[600px]"} relative shadow-xs`}>
       
-      {/* Map Control Bar Top */}
-      <div className="bg-[#0e131d] px-3 sm:px-4 py-2.5 border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-2 z-20">
+      {/* Map Control Bar Top (Scientific institutional controls) */}
+      <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 z-20">
         
-        {/* Variable Selector */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 max-w-full">
-          <span className="text-[11px] font-mono-tech text-slate-400 uppercase hidden sm:inline mr-1">
-            LAYER:
+        {/* Variable Selector: TEMPERATURE, PRECIPITATION, WIND, HUMIDITY, EXTREME RISK */}
+        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mr-1 hidden sm:inline">
+            Layer:
           </span>
           {FORECAST_VARIABLES.map((v) => {
             const isActive = activeVariable === v.id;
@@ -235,10 +226,10 @@ export function IndiaWeatherMap({ standalone = false }) {
               <button
                 key={v.id}
                 onClick={() => setActiveVariable(v.id)}
-                className={`px-2.5 py-1 rounded text-xs font-mono-tech whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
                   isActive
-                    ? "bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/40 shadow-[0_0_8px_rgba(56,189,248,0.2)]"
-                    : "bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.05]"
+                    ? "bg-[#0b3d91] text-white shadow-2xs"
+                    : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
                 {v.label}
@@ -248,84 +239,63 @@ export function IndiaWeatherMap({ standalone = false }) {
         </div>
 
         {/* View Options */}
-        <div className="flex items-center gap-2 text-xs font-mono-tech">
-          <button
-            onClick={() => setShowRadarSweep(!showRadarSweep)}
-            className={`px-2 py-1 rounded border text-[11px] flex items-center gap-1 cursor-pointer ${
-              showRadarSweep 
-                ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/30" 
-                : "text-slate-500 border-white/[0.05]"
-            }`}
-          >
-            <Radio className="w-3 h-3" />
-            <span className="hidden sm:inline">Radar Sweep</span>
-          </button>
-
+        <div className="flex items-center gap-2 text-xs">
           <button
             onClick={() => setShowStations(!showStations)}
-            className={`px-2 py-1 rounded border text-[11px] flex items-center gap-1 cursor-pointer ${
+            className={`px-3 py-1.5 rounded border text-xs font-medium flex items-center gap-1.5 cursor-pointer ${
               showStations 
-                ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/30" 
-                : "text-slate-500 border-white/[0.05]"
+                ? "bg-slate-200 text-slate-900 border-slate-300" 
+                : "bg-white text-slate-600 border-slate-200"
             }`}
           >
-            <MapPin className="w-3 h-3" />
-            <span className="hidden sm:inline">Stations</span>
+            <MapPin className="w-3.5 h-3.5 text-[#0b3d91]" />
+            <span>Stations</span>
           </button>
         </div>
 
       </div>
 
       {/* Main Map Container */}
-      <div className="relative flex-1 w-full bg-[#0a0d14]">
+      <div className="relative flex-1 w-full bg-slate-100">
         <div ref={mapContainerRef} className="w-full h-full" />
 
-        {/* Subtle Atmospheric Radar Sweep Overlay */}
-        {showRadarSweep && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-10 opacity-30">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-cyan-500/10">
-              <div className="absolute top-1/2 left-1/2 w-[350px] h-[350px] border-r-2 border-cyan-400/40 origin-top-left animate-radar-sweep" />
-            </div>
-          </div>
-        )}
-
-        {/* Current Map Legend Overlay (Top Left) */}
-        <div className="absolute top-3 left-3 z-20 bg-[#0f141f]/90 backdrop-blur-md border border-white/[0.1] rounded p-2.5 text-xs font-mono-tech max-w-xs shadow-xl pointer-events-auto">
-          <div className="flex items-center justify-between text-cyan-400 font-bold border-b border-white/[0.06] pb-1 mb-1.5">
-            <span className="uppercase">{activeVariable} SYNTHESIS</span>
-            <span className="text-[10px] text-slate-400">LEAD: {timelineStep}</span>
+        {/* Clean Scientific Legend Overlay (Top Left) */}
+        <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur-xs border border-slate-200 rounded-md p-3 text-xs max-w-xs shadow-sm pointer-events-auto">
+          <div className="flex items-center justify-between text-slate-900 font-bold border-b border-slate-100 pb-1.5 mb-1.5">
+            <span className="uppercase tracking-wider text-[11px] text-[#0b3d91]">{activeVariable} SYNTHESIS</span>
+            <span className="text-[10px] font-mono-tech text-slate-500 font-normal">T+{timelineStep}</span>
           </div>
 
-          <div className="text-[11px] text-slate-300 mb-1">
-            Station Focus: <strong className="text-white">{selectedLocation.name}</strong> ({selectedLocation.lat.toFixed(2)}°N)
+          <div className="text-xs text-slate-700 mb-1">
+            Station Focus: <strong className="text-slate-900">{selectedLocation.name}</strong> ({selectedLocation.lat.toFixed(2)}°N)
           </div>
 
-          <div className="text-[10px] text-slate-400 leading-tight">
-            Click any radar marker on the map to switch active station & blended weighting.
+          <div className="text-[11px] text-slate-500 leading-normal">
+            Click any station on the map to switch active focus and view multi-model allocation.
           </div>
 
           {isMockMode && (
-            <div className="mt-1.5 pt-1 border-t border-white/[0.05] text-[9px] text-amber-400">
-              ● SIMULATED ENSEMBLE FIELD (MOCK MODE)
+            <div className="mt-2 pt-1.5 border-t border-slate-100 text-[10px] text-amber-700 font-medium">
+              ● Simulated operational demonstration data
             </div>
           )}
         </div>
 
         {/* Coordinates Reticle indicator Bottom Left */}
-        <div className="absolute bottom-16 left-3 z-20 bg-black/60 px-2 py-1 rounded text-[10px] font-mono-tech text-slate-400 border border-white/[0.05]">
-          LAT/LON: {selectedLocation.lat.toFixed(3)}°N / {selectedLocation.lon.toFixed(3)}°E • ELEV: {selectedLocation.elevation}m
+        <div className="absolute bottom-4 left-3 z-20 bg-white/90 px-2.5 py-1 rounded text-[11px] font-mono-tech text-slate-600 border border-slate-200 shadow-2xs">
+          COORD: {selectedLocation.lat.toFixed(3)}°N, {selectedLocation.lon.toFixed(3)}°E • ELEV: {selectedLocation.elevation}m
         </div>
 
       </div>
 
       {/* Bottom Timeline Controls Bar */}
-      <div className="bg-[#0e131d] px-3 sm:px-6 py-2.5 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 z-20">
+      <div className="bg-slate-50 px-4 sm:px-6 py-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 z-20">
         
         {/* Play/Pause Control */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-mono-tech transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-[#0b3d91] hover:bg-[#072a66] text-white text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer shadow-2xs"
           >
             {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             <span>{isPlaying ? "PAUSE" : "ANIMATE TIMELINE"}</span>
@@ -337,7 +307,7 @@ export function IndiaWeatherMap({ standalone = false }) {
               setTimelineStep("NOW");
             }}
             title="Reset to NOW"
-            className="p-1.5 rounded bg-white/[0.05] text-slate-400 hover:text-white border border-white/[0.08] cursor-pointer"
+            className="p-1.5 rounded bg-white text-slate-600 hover:text-slate-900 border border-slate-200 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -354,10 +324,10 @@ export function IndiaWeatherMap({ standalone = false }) {
                   setIsPlaying(false);
                   setTimelineStep(step);
                 }}
-                className={`px-2.5 sm:px-3 py-1 rounded text-xs font-mono-tech transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded text-xs font-semibold font-mono-tech transition-colors cursor-pointer ${
                   isCurrent
-                    ? "bg-cyan-400 text-slate-950 font-bold shadow-[0_0_12px_#38bdf8]"
-                    : "bg-[#161d2d] text-slate-400 hover:text-slate-200 border border-white/[0.05]"
+                    ? "bg-[#0b3d91] text-white shadow-2xs"
+                    : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
                 {step}

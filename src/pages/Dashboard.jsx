@@ -9,7 +9,7 @@ import { IndiaWeatherMap } from "../components/map/IndiaWeatherMap.jsx";
 import { ExtremeRiskCards } from "../components/extremes/ExtremeRiskCards.jsx";
 import { TechnicalHeaderLine } from "../components/common/StatusBadge.jsx";
 import { Link } from "react-router-dom";
-import { ArrowRight, Layers, Map as MapIcon, AlertTriangle, Compass } from "lucide-react";
+import { ArrowRight, Map as MapIcon, AlertTriangle } from "lucide-react";
 
 export function Dashboard() {
   return (
@@ -39,17 +39,17 @@ export function Dashboard() {
         <HybridModelPanel />
 
         {/* Interactive India Weather Map */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MapIcon className="w-4 h-4 text-cyan-400" />
-              <h3 className="font-heading font-bold text-base text-white">
-                INTERACTIVE INDIA METEOROLOGICAL RADAR MAP
+              <MapIcon className="w-5 h-5 text-[#0b3d91]" />
+              <h3 className="font-bold text-lg text-slate-900 tracking-tight">
+                SYNOPTIC WEATHER & RADAR OBSERVATION MAP
               </h3>
             </div>
             <Link 
               to="/map" 
-              className="text-xs font-mono-tech text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+              className="text-xs font-semibold text-[#0b3d91] hover:text-[#082a66] flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-md border border-blue-200"
             >
               <span>Full Screen Command Map</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -63,23 +63,23 @@ export function Dashboard() {
         <ForecastTimeline />
 
         {/* Quick Extreme Weather Section Preview */}
-        <div className="pt-4 border-t border-white/[0.06] space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="pt-6 border-t border-slate-200 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-400" />
-                <h3 className="font-heading font-bold text-base text-white">
+                <AlertTriangle className="w-5 h-5 text-rose-600" />
+                <h3 className="font-bold text-lg text-slate-900 tracking-tight">
                   ACTIVE EXTREME WEATHER WARNINGS
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 font-mono-tech">
+              <p className="text-xs text-slate-500 font-medium">
                 Automated multi-model threat assessment for disaster mitigation
               </p>
             </div>
 
             <Link
               to="/extremes"
-              className="text-xs font-mono-tech text-rose-400 hover:text-rose-300 flex items-center gap-1"
+              className="text-xs font-semibold text-rose-700 hover:text-rose-900 flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-md border border-rose-200 w-fit"
             >
               <span>View All Disaster Alerts</span>
               <ArrowRight className="w-3.5 h-3.5" />

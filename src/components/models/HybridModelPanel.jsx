@@ -1,174 +1,163 @@
-import React, { useEffect, useRef } from "react";
-import { Layers, HelpCircle, ArrowRight, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
+import React from "react";
+import { Layers, ArrowRight, HelpCircle, CheckCircle } from "lucide-react";
 import { useWeather } from "../../context/WeatherContext.jsx";
-import gsap from "gsap";
 
 export function HybridModelPanel() {
   const { selectedLocation, openExplainModal, isMockMode } = useWeather();
   const weights = selectedLocation.modelWeights;
-  const barsRef = useRef(null);
-
-  useEffect(() => {
-    if (barsRef.current) {
-      const bars = barsRef.current.querySelectorAll(".weight-fill");
-      gsap.fromTo(
-        bars,
-        { width: "0%" },
-        { 
-          width: (i, target) => target.dataset.targetWidth,
-          duration: 0.8,
-          ease: "power2.out",
-          stagger: 0.1
-        }
-      );
-    }
-  }, [selectedLocation.id, weights]);
 
   const models = [
     {
       id: "nwp",
       name: "NWP MODEL",
-      subtitle: "ECMWF IFS / IMD High-Res GFS",
-      description: "Governed by Navier-Stokes, thermodynamic mass conservation, and hydrostatic balance.",
+      subtitle: "ECMWF IFS / IMD High-Resolution GFS",
+      description: "Governed by Navier-Stokes dynamical equations, thermodynamic mass conservation, and atmospheric physics parameterizations.",
       weight: weights.nwp,
-      color: "bg-slate-300",
-      textColor: "text-slate-200",
-      border: "border-slate-500/20",
-      glow: ""
+      barColor: "bg-[#0b3d91]",
+      textColor: "text-[#0b3d91]",
+      badge: "Physics Baseline"
     },
     {
       id: "aiA",
       name: "AI MODEL A",
-      subtitle: "FuXi / GraphCast Spherical Transformer",
-      description: "Trained on 40-year ERA5 reanalysis; fast gradient-based precipitation localization.",
+      subtitle: "FuXi / Spherical Graph Neural Network",
+      description: "Trained on 40-year ERA5 reanalysis; fast gradient-based precipitation localization and regional mesoscale feature capture.",
       weight: weights.aiA,
-      color: "bg-emerald-500/70",
-      textColor: "text-emerald-300/90",
-      border: "border-emerald-500/20",
-      glow: ""
+      barColor: "bg-emerald-600",
+      textColor: "text-emerald-700",
+      badge: "Fast Convective Surrogates"
     },
     {
       id: "aiB",
       name: "AI MODEL B",
       subtitle: "WeatherNext / Pangu-Weather 3D ViT",
-      description: "Pressure-level attention network; conservative long-wave teleconnection trends.",
+      description: "Pressure-level attention network; conservative synoptic long-wave teleconnection trends and geopotential balance.",
       weight: weights.aiB,
-      color: "bg-amber-500/70",
-      textColor: "text-amber-300/90",
-      border: "border-amber-500/20",
-      glow: ""
+      barColor: "bg-amber-600",
+      textColor: "text-amber-700",
+      badge: "Synoptic Attention"
     }
   ];
 
   return (
-    <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-4 sm:p-5 relative overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-xs">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-2">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300">
-            <Layers className="w-4 h-4" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 mb-6 border-b border-slate-200 gap-3">
+        <div>
+          <div className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#0b3d91]" />
+            <span>Multi-Model Blending Engine</span>
           </div>
-          <div>
-            <h3 className="font-heading font-semibold text-base text-white tracking-wide flex items-center gap-2">
-              HYBRID MODEL
-              <span className="text-[10px] font-mono-tech uppercase px-1.5 py-0.5 rounded bg-white/[0.05] text-slate-300 border border-white/10">
-                DYNAMIC BLENDING
-              </span>
-            </h3>
-            <p className="text-[11px] text-slate-400 font-mono-tech">
-              Meta-Learner Condition-Aware Multi-Model Fusion
-            </p>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            HOW THE FORECAST IS BUILT
+          </h2>
+          <p className="text-sm text-slate-600 mt-1">
+            Different atmospheric conditions require different models.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {isMockMode && (
-            <span className="font-mono-tech text-[10px] uppercase px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/10">
-              DEMO / SIMULATED WEIGHTS
+            <span className="text-[11px] font-medium uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              SIMULATED WEIGHTS
             </span>
           )}
           <button
             onClick={openExplainModal}
-            className="flex items-center gap-1 text-xs font-mono-tech text-slate-300 hover:text-white px-2 py-1 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0b3d91] hover:text-[#072a66] px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
-            <span>Why these weights?</span>
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>EXPLAIN WEIGHTING MATH →</span>
           </button>
         </div>
       </div>
 
-      {/* Model Weights Progress Bars */}
-      <div ref={barsRef} className="space-y-4 mb-4">
+      {/* Horizontal Model Contribution Bar (Unified) */}
+      <div className="mb-6">
+        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+          <span>Active Forecast Weight Distribution</span>
+          <span className="font-mono-tech text-slate-700">Total: 100%</span>
+        </div>
+        <div className="w-full h-4 rounded-full overflow-hidden flex bg-slate-100 p-0.5 border border-slate-200">
+          <div 
+            style={{ width: `${weights.nwp}%` }} 
+            className="h-full bg-[#0b3d91] transition-all" 
+            title={`NWP: ${weights.nwp}%`}
+          />
+          <div 
+            style={{ width: `${weights.aiA}%` }} 
+            className="h-full bg-emerald-600 transition-all" 
+            title={`AI-A: ${weights.aiA}%`}
+          />
+          <div 
+            style={{ width: `${weights.aiB}%` }} 
+            className="h-full bg-amber-600 transition-all" 
+            title={`AI-B: ${weights.aiB}%`}
+          />
+        </div>
+        <div className="mt-2 flex items-center justify-between text-xs text-slate-600 font-medium">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-sm bg-[#0b3d91]" />
+            <span>NWP Model ({weights.nwp}%)</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-sm bg-emerald-600" />
+            <span>AI Model A ({weights.aiA}%)</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-sm bg-amber-600" />
+            <span>AI Model B ({weights.aiB}%)</span>
+          </span>
+        </div>
+      </div>
+
+      {/* 3 Model Detailed Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {models.map((m) => (
-          <div key={m.id} className="bg-[#141a27] border border-white/[0.04] rounded p-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-baseline gap-2">
-                <span className={`font-mono-tech text-xs font-semibold tracking-wider ${m.textColor}`}>
-                  {m.name}
+          <div key={m.id} className="p-4 rounded-lg border border-slate-200 bg-slate-50 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-600">
+                  {m.badge}
                 </span>
-                <span className="text-[11px] text-slate-400 font-mono-tech hidden sm:inline">
-                  • {m.subtitle}
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className={`font-mono-tech text-base font-semibold ${m.textColor}`}>
+                <span className={`text-xl font-extrabold ${m.textColor}`}>
                   {m.weight}%
                 </span>
-                <span className="text-[10px] text-slate-500 font-mono-tech">contribution</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-900">{m.name}</h4>
+              <p className="text-xs text-slate-500 font-medium mb-2">{m.subtitle}</p>
+              <p className="text-xs text-slate-600 leading-relaxed">{m.description}</p>
+            </div>
+            
+            <div className="mt-4 pt-3 border-t border-slate-200/80">
+              <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div className={`h-full ${m.barColor}`} style={{ width: `${m.weight}%` }} />
               </div>
             </div>
-
-            {/* Visual Weight Bar */}
-            <div className="w-full h-2.5 bg-black/40 rounded-full overflow-hidden p-0.5 border border-white/[0.04]">
-              <div 
-                className={`weight-fill h-full rounded-full transition-all ${m.color}`}
-                data-target-width={`${m.weight}%`}
-                style={{ width: `${m.weight}%` }}
-              />
-            </div>
-
-            <p className="mt-1.5 text-[11px] text-slate-400 leading-normal">
-              {m.description}
-            </p>
           </div>
         ))}
       </div>
 
-      {/* Hybrid Forecast Synthesis Output Box */}
-      <div className="bg-[#141a27] border border-white/10 rounded p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center text-slate-300 shrink-0">
-            <Zap className="w-4 h-4 text-slate-300" />
+      {/* Plain Language Summary Callout (Understood in 10 seconds by SIH Juror) */}
+      <div className="p-4 rounded-md bg-blue-50/70 border border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="text-xs font-bold uppercase text-[#0b3d91] tracking-wider">
+            Regime-Aware Dynamic Adaptation
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-heading font-semibold text-sm text-white tracking-wide">
-                HYBRID FORECAST SYNTHESIS
-              </span>
-              <span className="text-[9px] font-mono-tech text-slate-300 px-1 py-0.2 rounded bg-white/[0.06] border border-white/10">
-                ACTIVE
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 font-mono-tech">
-              Residual bias: -0.18°C / +0.4mm • Variance Reduction: 34.2%
-            </p>
-          </div>
+          <p className="text-sm text-slate-800">
+            The system dynamically adjusts model contribution according to atmospheric regime, location and forecast lead time.
+          </p>
         </div>
 
         <button
           onClick={openExplainModal}
-          className="self-start sm:self-auto px-3 py-1.5 rounded bg-slate-200 text-slate-900 font-mono-tech text-xs font-semibold hover:bg-white transition-colors flex items-center gap-1 cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded text-xs font-bold bg-[#0b3d91] hover:bg-[#072a66] text-white transition-colors shrink-0 cursor-pointer shadow-2xs"
         >
-          <span>Audit Blending Math</span>
+          <span>EXPLAIN WEIGHTING MATH</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
-
-      {/* Explanatory Note */}
-      <p className="mt-3 text-[11px] text-slate-400 font-mono-tech leading-relaxed">
-        “Model weights adapt according to atmospheric regime, forecast lead time, and geographic location.”
-      </p>
 
     </div>
   );

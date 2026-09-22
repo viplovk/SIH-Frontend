@@ -1,162 +1,148 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { 
-  Thermometer, 
   Droplets, 
   Wind, 
   Gauge, 
   CloudRain, 
   Cloud, 
   Eye, 
-  Sun,
+  MapPin,
   Activity,
-  Layers,
-  ArrowUpRight
+  Sun
 } from "lucide-react";
 import { useWeather } from "../../context/WeatherContext.jsx";
-import gsap from "gsap";
 
 export function WeatherOverview() {
   const { selectedLocation, isMockMode } = useWeather();
   const current = selectedLocation.baseWeather;
-  const tempRef = useRef(null);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (tempRef.current) {
-      gsap.fromTo(
-        tempRef.current,
-        { scale: 0.96, opacity: 0.7 },
-        { scale: 1, opacity: 1, duration: 0.4, ease: "power2.out" }
-      );
-    }
-  }, [selectedLocation.id]);
 
   const metrics = [
     {
       id: "humidity",
       label: "Relative Humidity",
       value: `${current.humidity}%`,
-      subtext: `Dew Pt: ${current.dewPoint}°C`,
-      icon: Droplets,
-      color: "text-slate-400"
+      subtext: `Dew Point: ${current.dewPoint}°C`,
+      icon: Droplets
     },
     {
       id: "wind",
       label: "Wind Velocity",
       value: `${current.windSpeed} km/h`,
-      subtext: current.windDirection,
-      icon: Wind,
-      color: "text-slate-400"
+      subtext: `Bearing: ${current.windDirection}`,
+      icon: Wind
     },
     {
       id: "pressure",
       label: "Surface Pressure",
       value: `${current.pressure} hPa`,
       subtext: "Reduced to MSL",
-      icon: Gauge,
-      color: "text-slate-400"
+      icon: Gauge
     },
     {
       id: "precipitation",
       label: "Rainfall Probability",
       value: `${current.precipitation}%`,
-      subtext: "Convective cells",
-      icon: CloudRain,
-      color: "text-slate-400"
+      subtext: "Convective cell risk",
+      icon: CloudRain
     },
     {
       id: "cloudCover",
-      label: "Total Cloud Cover",
+      label: "Cloud Cover",
       value: `${current.cloudCover}%`,
-      subtext: "Stratocumulus",
-      icon: Cloud,
-      color: "text-slate-400"
+      subtext: "Stratocumulus layer",
+      icon: Cloud
     },
     {
       id: "visibility",
       label: "Horizontal Visibility",
       value: `${current.visibility} km`,
       subtext: "Aerosol optical depth",
-      icon: Eye,
-      color: "text-slate-400"
+      icon: Eye
     }
   ];
 
   return (
-    <div ref={containerRef} className="bg-[#101520] border border-white/[0.06] rounded-lg p-4 sm:p-5 relative overflow-hidden">
-      {/* Subtle background coordinate grid */}
-      <div className="absolute inset-0 bg-grid-tech opacity-30 pointer-events-none" />
-
-      {/* Top Header Label */}
-      <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/[0.05] relative z-10">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-          <span className="font-mono-tech text-xs uppercase tracking-wider text-slate-300 font-semibold">
-            METEOROLOGICAL STATE ESTIMATE
-          </span>
-          <span className="text-[10px] font-mono-tech px-1.5 py-0.2 rounded bg-white/[0.04] text-slate-400">
-            HYBRID BLENDED
-          </span>
+    <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-xs">
+      
+      {/* Top Editorial Label Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-slate-200">
+        <div>
+          <div className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#0b3d91]" />
+            <span>Current Meteorological State</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            {selectedLocation.name}, <span className="text-slate-500 font-medium">{selectedLocation.state}</span>
+          </h2>
         </div>
 
-        {isMockMode && (
-          <span className="font-mono-tech text-[10px] uppercase px-2 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/10">
-            DEMO / SIMULATED DATA
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {isMockMode && (
+            <span className="text-[11px] font-medium uppercase px-2.5 py-1 rounded bg-slate-100 text-slate-600 border border-slate-200">
+              SIMULATED BASELINE
+            </span>
+          )}
+          <div className="text-xs text-slate-500 font-mono-tech">
+            Station: {selectedLocation.lat}°N, {selectedLocation.lon}°E
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+      {/* Primary Conditions Display with Thin Dividers */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
         
-        {/* Main Temperature Hero Block (5 cols) */}
-        <div className="lg:col-span-4 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.06] pb-4 lg:pb-0 lg:pr-6">
+        {/* Main Temperature Section (4 cols) */}
+        <div className="lg:col-span-4 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 pb-6 lg:pb-0 lg:pr-8">
           <div>
-            <div className="flex items-center justify-between text-xs font-mono-tech text-slate-400 mb-1">
-              <span>SURFACE AMBIENT</span>
-              <span>2m AIR LEVEL</span>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              Surface Temperature (2m Air)
             </div>
             
-            <div className="flex items-baseline gap-2">
-              <span ref={tempRef} className="text-5xl sm:text-6xl font-heading font-bold text-white tracking-tighter">
-                {current.temperature}°
+            <div className="flex items-baseline gap-1">
+              <span className="text-5xl sm:text-6xl font-extrabold text-slate-900 tracking-tight">
+                {current.temperature}
               </span>
-              <span className="text-xl sm:text-2xl font-mono-tech text-slate-400 font-light">C</span>
+              <span className="text-2xl font-light text-slate-400">°C</span>
             </div>
 
-            <div className="mt-1 flex items-center gap-2 text-xs font-mono-tech text-slate-400">
-              <span>Feels like: <strong className="text-slate-300">{current.feelsLike}°C</strong></span>
-              <span>•</span>
-              <span className="text-slate-300">UV Index: {current.uvIndex}</span>
+            <div className="mt-3 flex items-center gap-3 text-sm text-slate-600 font-medium">
+              <span>Feels like <strong>{current.feelsLike}°C</strong></span>
+              <span className="text-slate-300">•</span>
+              <span>UV Index: <strong>{current.uvIndex}</strong></span>
+            </div>
+
+            <div className="mt-2 text-xs text-slate-500">
+              Current Regime: <strong className="text-slate-800">{selectedLocation.currentRegime}</strong>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/[0.04] text-[11px] font-mono-tech text-slate-400 flex items-center justify-between">
-            <span>AQI: <strong className="text-slate-300">{current.airQualityIndex}</strong> (Moderate)</span>
-            <span className="text-slate-500">In-situ AWS IMD-Ref</span>
+          <div className="mt-6 pt-4 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between">
+            <span>Air Quality Index (AQI): <strong className="text-slate-800 font-semibold">{current.airQualityIndex}</strong></span>
+            <span className="text-slate-400">IMD AWS Telemetry</span>
           </div>
         </div>
 
-        {/* 6 Supporting Parameters Grid (8 cols) */}
-        <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {metrics.map((m) => {
+        {/* 6 Essential Meteorological Metrics with Thin Dividers (8 cols) */}
+        <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-6">
+          {metrics.map((m, idx) => {
             const Icon = m.icon;
             return (
               <div 
                 key={m.id}
-                className="bg-[#141a27] border border-white/[0.04] rounded p-2.5 sm:p-3 hover:border-white/10 transition-all"
+                className="flex flex-col justify-between pb-3 border-b sm:border-b-0 border-slate-100"
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono-tech text-slate-400 uppercase tracking-tight">
-                    {m.label}
-                  </span>
-                  <Icon className={`w-3.5 h-3.5 ${m.color}`} />
-                </div>
-                
-                <div className="text-lg sm:text-xl font-heading font-bold text-white tracking-tight">
-                  {m.value}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5 text-xs font-medium text-slate-500">
+                    <span className="uppercase tracking-wider">{m.label}</span>
+                    <Icon className="w-4 h-4 text-slate-400" />
+                  </div>
+                  
+                  <div className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                    {m.value}
+                  </div>
                 </div>
 
-                <div className="text-[10px] font-mono-tech text-slate-400 mt-0.5 truncate">
+                <div className="text-xs text-slate-500 mt-1">
                   {m.subtext}
                 </div>
               </div>

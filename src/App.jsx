@@ -31,7 +31,7 @@ export default function App() {
     <WeatherProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <div className="min-h-screen bg-[#0b0e14] text-[#e6edf3] flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+        <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
           {/* Main Top Navigation */}
           <Navbar />
 

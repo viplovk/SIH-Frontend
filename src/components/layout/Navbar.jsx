@@ -1,222 +1,217 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
-  Activity, 
-  Map as MapIcon, 
-  Layers, 
-  AlertTriangle, 
-  Compass, 
-  BookOpen, 
-  Info, 
   Menu, 
   X, 
-  Sliders, 
-  Radio, 
   Database,
-  CloudSun
+  MapPin,
+  ChevronRight
 } from "lucide-react";
 import { useWeather } from "../../context/WeatherContext.jsx";
-import gsap from "gsap";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { isMockMode, toggleMockMode } = useWeather();
-  const navRef = useRef(null);
-  const mobileDrawerRef = useRef(null);
+  const { isMockMode, toggleMockMode, selectedLocation, setSelectedLocation, locationsList } = useWeather();
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   const navLinks = [
-    { name: "Dashboard", path: "/", icon: Activity },
-    { name: "Forecast", path: "/forecast", icon: CloudSun },
-    { name: "Weather Map", path: "/map", icon: MapIcon },
-    { name: "Models", path: "/models", icon: Layers },
-    { name: "Extreme Events", path: "/extremes", icon: AlertTriangle },
-    { name: "Uncertainty", path: "/uncertainty", icon: Compass },
-    { name: "Research", path: "/research", icon: BookOpen },
-    { name: "About", path: "/about", icon: Info }
+    { name: "Forecast", path: "/forecast" },
+    { name: "Weather Map", path: "/map" },
+    { name: "Models", path: "/models" },
+    { name: "Extreme Weather", path: "/extremes" },
+    { name: "Uncertainty", path: "/uncertainty" },
+    { name: "Research", path: "/research" },
+    { name: "About", path: "/about" }
   ];
-
-  // GSAP initial load entrance animation
-  useEffect(() => {
-    if (navRef.current) {
-      gsap.fromTo(
-        navRef.current,
-        { y: -16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
-      );
-    }
-  }, []);
-
-  // GSAP drawer slide animation
-  useEffect(() => {
-    if (mobileDrawerRef.current) {
-      if (mobileMenuOpen) {
-        gsap.fromTo(
-          mobileDrawerRef.current,
-          { opacity: 0, x: 40 },
-          { opacity: 1, x: 0, duration: 0.25, ease: "power2.out" }
-        );
-      }
-    }
-  }, [mobileMenuOpen]);
 
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setShowLocationPicker(false);
   }, [location.pathname]);
 
   return (
-    <nav ref={navRef} className="sticky top-0 z-50 bg-[#0c1017]/95 backdrop-blur-md border-b border-white/[0.06]">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 text-slate-900">
+      {/* Institutional Top Bar (Subtle scientific notice & location telemetry) */}
+      <div className="border-b border-slate-100 bg-slate-50 text-[11px] text-slate-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-7 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-slate-800 tracking-wider">SMART INDIA HACKATHON 2026</span>
+            <span className="text-slate-300">|</span>
+            <span className="text-slate-500 hidden sm:inline">SIH26081 • DISASTER MANAGEMENT</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-status-pulse" />
+              <span className="text-slate-700 font-medium">STATION: {selectedLocation.name.toUpperCase()}</span>
+            </div>
+            <span className="text-slate-300">•</span>
+            <button
+              onClick={toggleMockMode}
+              className="text-[11px] text-slate-600 hover:text-[#0b3d91] font-medium transition-colors cursor-pointer"
+            >
+              {isMockMode ? "MODE: SIMULATION" : "MODE: LIVE API"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between h-16">
           
-          {/* Brand Logo & Wordmark */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-8 h-8 rounded bg-[#131924] border border-white/10 flex items-center justify-center overflow-hidden">
-              <Radio className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
+          {/* Brand Identity */}
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-8 h-8 rounded bg-[#0b3d91] flex items-center justify-center text-white font-bold text-base shadow-sm">
+              A
             </div>
             <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="font-heading font-semibold text-base tracking-wider text-slate-100 group-hover:text-white transition-colors">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-lg tracking-tight text-slate-900 group-hover:text-[#0b3d91] transition-colors">
                   ALGORIOT
                 </span>
-                <span className="text-[9px] font-mono-tech uppercase px-1.5 py-0.5 rounded bg-white/[0.05] text-slate-400 border border-white/10">
-                  SIH26
+                <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                  HYBRID INTEL
                 </span>
               </div>
-              <span className="text-[10px] tracking-tight text-slate-400 font-mono-tech -mt-0.5 hidden sm:block">
-                HYBRID WEATHER INTELLIGENCE
+              <span className="text-[11px] tracking-wide text-slate-500 font-normal uppercase -mt-0.5">
+                Hybrid Weather Intelligence
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden xl:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-1 h-full">
             {navLinks.map((link) => {
-              const Icon = link.icon;
               const isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  className={`h-full flex items-center px-3.5 text-xs font-semibold uppercase tracking-wider transition-all border-b-2 ${
                     isActive
-                      ? "text-slate-100 bg-white/[0.08] border border-white/15"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
+                      ? "text-[#0b3d91] border-[#0b3d91] bg-blue-50/40"
+                      : "text-slate-600 hover:text-slate-900 border-transparent hover:border-slate-300"
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-slate-200" : "text-slate-500"}`} />
-                  <span>{link.name}</span>
+                  {link.name}
                 </Link>
               );
             })}
-          </div>
+          </nav>
 
-          {/* Medium Screen Nav Links (compact) */}
-          <div className="hidden lg:flex xl:hidden items-center space-x-1">
-            {navLinks.slice(0, 5).map((link) => {
-              const Icon = link.icon;
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs ${
-                    isActive
-                      ? "text-slate-100 bg-white/[0.08] border border-white/15"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
-            <Link
-              to="/research"
-              className={`px-2 py-1 text-xs ${
-                location.pathname === "/research" ? "text-slate-100 font-medium" : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              Research
-            </Link>
-          </div>
-
-          {/* Right Status Controls */}
+          {/* Right Action Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Live / Mock Mode Switcher Pill */}
-            <button
-              onClick={toggleMockMode}
-              title={isMockMode ? "Currently using simulated meteorological baseline data. Click to switch to live FastAPI mode." : "Using Live FastAPI connection."}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-mono-tech border border-white/10 bg-white/[0.03] text-slate-300 hover:bg-white/[0.06] transition-all"
-            >
-              <Database className="w-3 h-3 text-slate-400" />
-              <span className="hidden sm:inline">{isMockMode ? "DEMO DATA" : "LIVE API"}</span>
-              <span className={`w-1.5 h-1.5 rounded-full ${isMockMode ? "bg-amber-400/80" : "bg-emerald-400/80"}`} />
-            </button>
+            {/* Quick Location Switcher Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowLocationPicker(!showLocationPicker)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 transition-colors shadow-xs"
+                title="Change monitoring station"
+              >
+                <MapPin className="w-3.5 h-3.5 text-[#0b3d91]" />
+                <span className="font-semibold">{selectedLocation.name}</span>
+                <span className="text-slate-400 text-[10px]">▼</span>
+              </button>
 
-            {/* Operational Engine status */}
-            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/25 border border-white/[0.06] text-[11px] font-mono-tech text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/80" />
-              <span>ENGINE: ONLINE</span>
+              {showLocationPicker && (
+                <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-md shadow-lg p-2 z-50">
+                  <div className="text-[11px] uppercase font-semibold text-slate-500 px-2 py-1 border-b border-slate-100 mb-1">
+                    Select Meteorological Station
+                  </div>
+                  <div className="max-h-60 overflow-y-auto space-y-0.5">
+                    {locationsList.map((loc) => (
+                      <button
+                        key={loc.id}
+                        onClick={() => {
+                          setSelectedLocation(loc);
+                          setShowLocationPicker(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded text-xs flex items-center justify-between transition-colors ${
+                          loc.id === selectedLocation.id
+                            ? "bg-blue-50 text-[#0b3d91] font-semibold"
+                            : "text-slate-700 hover:bg-slate-100"
+                        }`}
+                      >
+                        <span>{loc.name}, {loc.state}</span>
+                        <span className="text-[10px] text-slate-400">{loc.baseWeather.temperature}°C</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Mobile Hamburger Button */}
+            {/* Live / Demo Mode Badge */}
+            <button
+              onClick={toggleMockMode}
+              title={isMockMode ? "Simulated historical and NWP blend data." : "Active live FastAPI ingestion."}
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] border font-medium transition-colors ${
+                isMockMode
+                  ? "bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100"
+                  : "bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100"
+              }`}
+            >
+              <Database className="w-3 h-3 text-current" />
+              <span>{isMockMode ? "SIMULATION DATA" : "LIVE SATELLITE"}</span>
+            </button>
+
+            {/* Mobile Menu Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] border border-white/[0.08]"
-              aria-label="Toggle navigation"
+              className="lg:hidden p-2 rounded text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200"
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 text-slate-200" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div 
-          ref={mobileDrawerRef}
-          className="lg:hidden border-t border-white/[0.08] bg-[#0c1017] px-4 pt-2 pb-5 space-y-1 shadow-xl"
-        >
-          <div className="py-1 mb-2 border-b border-white/[0.05] flex items-center justify-between text-xs font-mono-tech text-slate-400">
-            <span>COMMAND NAVIGATION</span>
-            <span className="text-slate-400 text-[10px]">TEAM ALGORIOT</span>
+        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 shadow-xl">
+          <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 pb-2 mb-2 border-b border-slate-100">
+            Navigation Index
           </div>
-
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="space-y-1">
+            <Link
+              to="/"
+              className={`block px-3 py-2 rounded text-sm font-medium ${
+                location.pathname === "/" ? "bg-blue-50 text-[#0b3d91] font-semibold" : "text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              Dashboard Overview
+            </Link>
             {navLinks.map((link) => {
-              const Icon = link.icon;
               const isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium transition-colors ${
-                    isActive
-                      ? "text-slate-100 bg-white/[0.08] border border-white/15"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent"
+                  className={`block px-3 py-2 rounded text-sm font-medium ${
+                    isActive ? "bg-blue-50 text-[#0b3d91] font-semibold" : "text-slate-700 hover:bg-slate-50"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-slate-200" : "text-slate-500"}`} />
-                  <span>{link.name}</span>
+                  {link.name}
                 </Link>
               );
             })}
           </div>
 
-          <div className="pt-3 mt-3 border-t border-white/[0.08] flex items-center justify-between text-xs">
-            <span className="text-slate-400 font-mono-tech text-[11px]">DATA PIPELINE:</span>
+          <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+            <span>Data Engine:</span>
             <button
               onClick={toggleMockMode}
-              className="text-[11px] font-mono-tech text-slate-300 hover:text-white underline"
+              className="font-medium text-[#0b3d91] hover:underline"
             >
-              {isMockMode ? "Switch to Live API Mode" : "Switch to Demo Mock Mode"}
+              {isMockMode ? "Switch to Live IMD Mode" : "Switch to Simulation Mode"}
             </button>
           </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }

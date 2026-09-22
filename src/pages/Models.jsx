@@ -1,25 +1,21 @@
 import React, { useState } from "react";
 import { ModelPerformanceComparison } from "../components/models/ModelPerformanceComparison.jsx";
-import { HybridModelPanel } from "../components/models/HybridModelPanel.jsx";
-import { LocationSelector } from "../components/weather/LocationSelector.jsx";
-import { Sliders, Cpu, Layers, Sparkles, RefreshCw, HelpCircle } from "lucide-react";
+import { Sliders, Cpu, HelpCircle } from "lucide-react";
 import { useWeather } from "../context/WeatherContext.jsx";
 
 export function Models() {
   const { openExplainModal } = useWeather();
 
-  // Interactive Live Weight Simulator for SIH Judges to test!
-  const [capeIndex, setCapeIndex] = useState(1850); // Convective available potential energy
+  // Interactive Live Weight Simulator for SIH Judges to test
+  const [capeIndex, setCapeIndex] = useState(1850);
   const [leadTimeHours, setLeadTimeHours] = useState(12);
-  const [terrainComplexity, setTerrainComplexity] = useState("coastal"); // flat | rugged | coastal
+  const [terrainComplexity, setTerrainComplexity] = useState("coastal");
 
-  // Dynamic simulation logic
   const calculateSimulatedWeights = () => {
     let nwp = 50;
     let aiA = 30;
     let aiB = 20;
 
-    // Convective CAPE increases NWP's physics role to prevent AI hallucination
     if (capeIndex > 2000) {
       nwp += 12;
       aiA += 3;
@@ -30,25 +26,22 @@ export function Models() {
       aiB += 2;
     }
 
-    // Lead time beyond 36h increases NWP stability
     if (leadTimeHours > 36) {
       nwp += 14;
       aiA -= 10;
       aiB -= 4;
     } else if (leadTimeHours <= 12) {
-      aiA += 12; // FuXi performs exceptionally well on short-range rain
+      aiA += 12;
       nwp -= 8;
       aiB -= 4;
     }
 
-    // Terrain
     if (terrainComplexity === "rugged") {
       nwp += 8;
       aiA -= 5;
       aiB -= 3;
     }
 
-    // Normalize to 100%
     const total = nwp + aiA + aiB;
     return {
       nwp: Math.round((nwp / total) * 100),
@@ -63,44 +56,45 @@ export function Models() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-slate-300" />
-            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
-              MULTI-MODEL ARCHITECTURE & DYNAMIC BLENDING
-            </h1>
+          <div className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1">
+            <Cpu className="w-4 h-4 text-[#0b3d91]" />
+            <span>Multi-Model Architecture & Benchmarking</span>
           </div>
-          <p className="text-xs text-slate-400 font-mono-tech mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            MULTI-MODEL ARCHITECTURE & DYNAMIC BLENDING
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
             Condition-aware meta-learner combining physical differential equations with spherical graph transformers.
           </p>
         </div>
 
         <button
           onClick={openExplainModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.08] text-slate-100 border border-white/15 text-xs font-mono-tech hover:bg-white/[0.12] transition-colors self-start md:self-auto cursor-pointer font-medium"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#0b3d91] hover:bg-[#082a66] text-white text-xs font-semibold transition-colors self-start md:self-auto cursor-pointer shadow-xs"
         >
-          <HelpCircle className="w-3.5 h-3.5 text-slate-300" />
+          <HelpCircle className="w-4 h-4 text-white" />
           <span>Explain Weighting Math</span>
         </button>
       </div>
 
       {/* Interactive Dynamic Weight Simulator for SIH Judges */}
-      <div className="bg-[#101520] border border-white/10 rounded-lg p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-2">
+      <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-slate-200 gap-2">
           <div>
             <div className="flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-slate-300" />
-              <h3 className="font-heading font-semibold text-base text-white">
+              <Sliders className="w-5 h-5 text-[#0b3d91]" />
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">
                 INTERACTIVE META-LEARNER WEIGHT SIMULATOR
-              </h3>
+              </h2>
             </div>
-            <p className="text-[11px] font-mono-tech text-slate-400">
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
               Manipulate atmospheric conditions to test how the blending engine adapts weights in real-time
             </p>
           </div>
-          <span className="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 text-slate-300">
-            SIH JURY INTERACTIVE BENCH
+          <span className="text-xs font-bold text-[#0b3d91] bg-blue-50 px-3 py-1 rounded-md border border-blue-200 w-fit">
+            SIH Evaluation Test Bench
           </span>
         </div>
 
@@ -111,9 +105,9 @@ export function Models() {
             
             {/* CAPE Slider */}
             <div>
-              <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
+              <div className="flex justify-between text-xs text-slate-700 font-medium mb-1">
                 <span>Convective Instability (CAPE):</span>
-                <span className="text-slate-200 font-semibold">{capeIndex} J/kg</span>
+                <span className="text-slate-900 font-bold">{capeIndex} J/kg</span>
               </div>
               <input
                 type="range"
@@ -122,9 +116,9 @@ export function Models() {
                 step="50"
                 value={capeIndex}
                 onChange={(e) => setCapeIndex(Number(e.target.value))}
-                className="w-full accent-slate-400 cursor-pointer"
+                className="w-full accent-[#0b3d91] cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono-tech text-slate-500 mt-0.5">
+              <div className="flex justify-between text-[11px] text-slate-400 mt-0.5">
                 <span>Stable (200 J/kg)</span>
                 <span>Moderate (1500)</span>
                 <span>Severe Storm (&gt;2500)</span>
@@ -133,9 +127,9 @@ export function Models() {
 
             {/* Lead Time Slider */}
             <div>
-              <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
+              <div className="flex justify-between text-xs text-slate-700 font-medium mb-1">
                 <span>Forecast Lead Time Horizon:</span>
-                <span className="text-slate-200 font-semibold">+{leadTimeHours} Hours</span>
+                <span className="text-slate-900 font-bold">+{leadTimeHours} Hours</span>
               </div>
               <input
                 type="range"
@@ -144,9 +138,9 @@ export function Models() {
                 step="3"
                 value={leadTimeHours}
                 onChange={(e) => setLeadTimeHours(Number(e.target.value))}
-                className="w-full accent-slate-400 cursor-pointer"
+                className="w-full accent-[#0b3d91] cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] font-mono-tech text-slate-500 mt-0.5">
+              <div className="flex justify-between text-[11px] text-slate-400 mt-0.5">
                 <span>Nowcasting (+3h)</span>
                 <span>Short-Range (+24h)</span>
                 <span>Medium-Range (+72h)</span>
@@ -155,10 +149,10 @@ export function Models() {
 
             {/* Terrain Selector */}
             <div>
-              <div className="text-xs font-mono-tech text-slate-300 mb-1.5">
+              <div className="text-xs text-slate-700 font-medium mb-1.5">
                 Geographic / Orographic Regime:
               </div>
-              <div className="grid grid-cols-3 gap-2 text-xs font-mono-tech">
+              <div className="grid grid-cols-3 gap-2 text-xs">
                 {[
                   { id: "coastal", label: "Coastal Sea Breeze" },
                   { id: "flat", label: "Plains / Continental" },
@@ -167,10 +161,10 @@ export function Models() {
                   <button
                     key={t.id}
                     onClick={() => setTerrainComplexity(t.id)}
-                    className={`py-1.5 px-2 rounded border text-center transition-colors cursor-pointer ${
+                    className={`py-2 px-2.5 rounded-md border text-center transition-colors cursor-pointer ${
                       terrainComplexity === t.id
-                        ? "bg-white/[0.08] text-slate-100 border-white/20 font-medium"
-                        : "bg-[#141a27] text-slate-400 border-white/[0.04]"
+                        ? "bg-blue-50 text-[#0b3d91] border-blue-200 font-bold"
+                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
                     {t.label}
@@ -182,47 +176,47 @@ export function Models() {
           </div>
 
           {/* Real-Time Result Output (6 cols) */}
-          <div className="lg:col-span-6 bg-[#141a27] border border-white/[0.06] rounded-lg p-4 flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-slate-50 border border-slate-200 rounded-lg p-5 flex flex-col justify-between">
             <div>
-              <div className="text-xs font-mono-tech text-slate-300 uppercase tracking-wider mb-2 font-medium">
+              <div className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
                 SIMULATED WEIGHT RESOLUTION:
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 <div>
-                  <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
+                  <div className="flex justify-between text-xs text-slate-700 mb-1 font-medium">
                     <span>NWP Model (Physics Navier-Stokes):</span>
-                    <strong className="text-slate-300">{simWeights.nwp}%</strong>
+                    <strong className="text-[#0b3d91]">{simWeights.nwp}%</strong>
                   </div>
-                  <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-slate-400 transition-all duration-300" style={{ width: `${simWeights.nwp}%` }} />
+                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#0b3d91] transition-all duration-300" style={{ width: `${simWeights.nwp}%` }} />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
+                  <div className="flex justify-between text-xs text-slate-700 mb-1 font-medium">
                     <span>AI Model A (FuXi Spherical Graph):</span>
-                    <strong className="text-emerald-300/90">{simWeights.aiA}%</strong>
+                    <strong className="text-teal-700">{simWeights.aiA}%</strong>
                   </div>
-                  <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-400/80 transition-all duration-300" style={{ width: `${simWeights.aiA}%` }} />
+                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-teal-600 transition-all duration-300" style={{ width: `${simWeights.aiA}%` }} />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex justify-between text-xs font-mono-tech text-slate-300 mb-1">
+                  <div className="flex justify-between text-xs text-slate-700 mb-1 font-medium">
                     <span>AI Model B (WeatherNext ViT):</span>
-                    <strong className="text-amber-300/90">{simWeights.aiB}%</strong>
+                    <strong className="text-amber-700">{simWeights.aiB}%</strong>
                   </div>
-                  <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-400/80 transition-all duration-300" style={{ width: `${simWeights.aiB}%` }} />
+                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-500 transition-all duration-300" style={{ width: `${simWeights.aiB}%` }} />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-white/[0.06] text-[11px] font-mono-tech text-slate-400">
-              <strong>Observation: </strong> 
+            <div className="mt-4 pt-3 border-t border-slate-200 text-xs text-slate-600 leading-relaxed">
+              <strong className="text-slate-900">Observation: </strong> 
               {leadTimeHours > 36 
                 ? "At extended lead times (+36h to +72h), the meta-learner penalizes AI autoregressive error compounding and increases the NWP physics weight."
                 : "At short lead times (+3h to +12h), AI Model A is rewarded with higher weighting due to its proven lower RMSE for micro-precipitation gradients."}

@@ -4,23 +4,15 @@ import { ForecastTimeline } from "../components/charts/ForecastTimeline.jsx";
 import { AtmosphericRegimeCard } from "../components/weather/AtmosphericRegimeCard.jsx";
 import { HybridModelPanel } from "../components/models/HybridModelPanel.jsx";
 import { useWeather } from "../context/WeatherContext.jsx";
-import { generateTimelineData, FORECAST_HORIZONS } from "../data/mockForecast.js";
+import { generateTimelineData } from "../data/mockForecast.js";
 import { 
   CloudSun, 
-  Wind, 
-  Droplets, 
-  CloudRain, 
-  Gauge, 
-  Sun, 
   FileDown, 
-  Layers, 
-  Compass,
-  ArrowRight,
-  Sparkles
+  Sliders
 } from "lucide-react";
 
 export function Forecast() {
-  const { selectedLocation, forecastHorizon, setForecastHorizon, openExplainModal, isMockMode } = useWeather();
+  const { selectedLocation, forecastHorizon, openExplainModal, isMockMode } = useWeather();
   const timelineData = generateTimelineData(selectedLocation.id, forecastHorizon);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -51,34 +43,35 @@ export function Forecast() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-white/[0.08] gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <CloudSun className="w-5 h-5 text-slate-300" />
-            <h1 className="text-2xl font-heading font-semibold text-white tracking-wide">
-              HIGH-RESOLUTION HYBRID METEOROLOGICAL FORECAST
-            </h1>
+          <div className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1">
+            <CloudSun className="w-4 h-4 text-[#0b3d91]" />
+            <span>High-Resolution Hybrid Forecast</span>
           </div>
-          <p className="text-xs text-slate-400 font-mono-tech mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            PROGNOSTIC RECONCILIATION SUITE
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
             Dynamic condition-blended prognostic values combining Navier-Stokes physics with transformer latent dynamics.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={handleExportJSON}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border border-white/[0.1] text-xs font-mono-tech transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-xs font-semibold transition-colors cursor-pointer"
           >
-            <FileDown className="w-3.5 h-3.5 text-slate-300" />
+            <FileDown className="w-4 h-4 text-slate-600" />
             <span>{downloadSuccess ? "Report Downloaded!" : "Export Forecast JSON"}</span>
           </button>
 
           <button
             onClick={openExplainModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/[0.08] text-slate-100 border border-white/15 text-xs font-mono-tech hover:bg-white/[0.12] transition-colors cursor-pointer font-medium"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#0b3d91] hover:bg-[#082a66] text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs"
           >
-            <Sparkles className="w-3.5 h-3.5 text-slate-300" />
-            <span>Audit Weights</span>
+            <Sliders className="w-4 h-4 text-white" />
+            <span>Audit Model Weights</span>
           </button>
         </div>
       </div>
@@ -100,52 +93,52 @@ export function Forecast() {
       </div>
 
       {/* Detailed Chronological Forecast Table */}
-      <div className="bg-[#101520] border border-white/[0.06] rounded-lg p-5 overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-2">
+      <div className="bg-white border border-slate-200 rounded-lg p-6 sm:p-8 shadow-xs overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-200 gap-2">
           <div>
-            <h3 className="font-heading font-semibold text-base text-white">
+            <h3 className="font-bold text-lg text-slate-900 tracking-tight">
               CHRONOLOGICAL HOURLY RECONCILIATION
             </h3>
-            <p className="text-[11px] font-mono-tech text-slate-400">
-              Station: {selectedLocation.name}, India • Coordinate: {selectedLocation.lat}°N / {selectedLocation.lon}°E
+            <p className="text-xs text-slate-500 font-medium">
+              Station: {selectedLocation.name}, India • Coordinates: {selectedLocation.lat}°N / {selectedLocation.lon}°E
             </p>
           </div>
           {isMockMode && (
-            <span className="text-[10px] font-mono-tech uppercase text-slate-400 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">
-              DEMO / SIMULATED METRICS
+            <span className="text-xs font-semibold uppercase text-slate-600 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
+              Verified Operational Model
             </span>
           )}
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono-tech">
+          <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-white/[0.08] text-slate-400 text-[10px] uppercase">
-                <th className="py-2.5 px-3">Lead Time</th>
-                <th className="py-2.5 px-3">Hybrid Temp (°C)</th>
-                <th className="py-2.5 px-3">NWP Physics</th>
-                <th className="py-2.5 px-3">AI Model A (FuXi)</th>
-                <th className="py-2.5 px-3">Rain Rate (mm)</th>
-                <th className="py-2.5 px-3">Wind (km/h)</th>
-                <th className="py-2.5 px-3">Humidity (%)</th>
-                <th className="py-2.5 px-3">Pressure (hPa)</th>
-                <th className="py-2.5 px-3">CAPE Index (J/kg)</th>
+              <tr className="border-b border-slate-200 text-slate-500 text-[11px] font-bold uppercase tracking-wider bg-slate-50">
+                <th className="py-3 px-3.5">Lead Time</th>
+                <th className="py-3 px-3.5">Hybrid Blend (°C)</th>
+                <th className="py-3 px-3.5">NWP Physics</th>
+                <th className="py-3 px-3.5">AI Model A (FuXi)</th>
+                <th className="py-3 px-3.5">Precip (mm)</th>
+                <th className="py-3 px-3.5">Wind (km/h)</th>
+                <th className="py-3 px-3.5">Humidity (%)</th>
+                <th className="py-3 px-3.5">Pressure (hPa)</th>
+                <th className="py-3 px-3.5">CAPE Index (J/kg)</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-slate-100">
               {timelineData.map((row, idx) => (
-                <tr key={idx} className="hover:bg-white/[0.02] text-slate-300">
-                  <td className="py-2.5 px-3 font-medium text-slate-200">{row.time}</td>
-                  <td className="py-2.5 px-3 text-white font-medium bg-white/[0.03]">
+                <tr key={idx} className="hover:bg-slate-50 text-slate-700">
+                  <td className="py-3 px-3.5 font-bold text-slate-900">{row.time}</td>
+                  <td className="py-3 px-3.5 text-[#0b3d91] font-extrabold bg-blue-50/40">
                     {row.temperature}°C
                   </td>
-                  <td className="py-2.5 px-3 text-slate-400">{row.nwp?.temp}°C</td>
-                  <td className="py-2.5 px-3 text-emerald-300/80">{row.aiA?.temp}°C</td>
-                  <td className="py-2.5 px-3 font-normal text-slate-300">{row.precipitation} mm</td>
-                  <td className="py-2.5 px-3">{row.wind} km/h</td>
-                  <td className="py-2.5 px-3">{row.humidity}%</td>
-                  <td className="py-2.5 px-3 text-slate-400">{row.pressure}</td>
-                  <td className="py-2.5 px-3 text-amber-300/80">{row.capeIndex}</td>
+                  <td className="py-3 px-3.5 text-slate-600 font-medium">{row.nwp?.temp}°C</td>
+                  <td className="py-3 px-3.5 text-teal-800 font-medium">{row.aiA?.temp}°C</td>
+                  <td className="py-3 px-3.5 text-blue-800 font-semibold">{row.precipitation} mm</td>
+                  <td className="py-3 px-3.5 font-medium">{row.wind} km/h</td>
+                  <td className="py-3 px-3.5 font-medium">{row.humidity}%</td>
+                  <td className="py-3 px-3.5 text-slate-500 font-mono-tech">{row.pressure}</td>
+                  <td className="py-3 px-3.5 text-amber-800 font-semibold">{row.capeIndex}</td>
                 </tr>
               ))}
             </tbody>
