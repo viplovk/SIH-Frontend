@@ -35,7 +35,11 @@ export function IndiaWeatherMap({ standalone = false }) {
   const [showStations, setShowStations] = useState(true);
   const [mapZoom, setMapZoom] = useState(5);
 
-  // Initialize Leaflet Map with CartoDB Positron Light Tiles
+  // Read CARTO Basemaps API key from environment
+  const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY;
+  const isMapConfigured = Boolean(cartoApiKey && typeof cartoApiKey === "string" && cartoApiKey.trim().length > 0);
+
+  // Initialize Leaflet Map with CartoDB Voyager Raster Tiles
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -46,14 +50,21 @@ export function IndiaWeatherMap({ standalone = false }) {
       minZoom: 4,
       maxZoom: 9,
       zoomControl: false,
-      attributionControl: false
+      attributionControl: true
     });
 
-    // CartoDB Positron Light Tile Layer (clean institutional cartography)
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd",
-      maxZoom: 19
-    }).addTo(map);
+    // Only load CARTO basemap when a valid API key is configured to avoid watermarks
+    if (isMapConfigured) {
+      L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${cartoApiKey}`,
+        {
+          subdomains: "abcd",
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>'
+        }
+      ).addTo(map);
+    }
 
     // Clean Zoom Control at bottom right
     L.control.zoom({ position: "bottomright" }).addTo(map);
@@ -74,7 +85,7 @@ export function IndiaWeatherMap({ standalone = false }) {
       map.remove();
       mapInstanceRef.current = null;
     };
-  }, []);
+  }, [isMapConfigured]);
 
   // Center map when selectedLocation changes
   useEffect(() => {
@@ -258,6 +269,24 @@ export function IndiaWeatherMap({ standalone = false }) {
       {/* Main Map Container */}
       <div className="relative flex-1 w-full bg-slate-100">
         <div ref={mapContainerRef} className="w-full h-full" />
+
+        {/* Graceful Fallback if CARTO Basemaps API key is missing */}
+        {!isMapConfigured && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-50/95 backdrop-blur-xs p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-[#0b3d91] mb-3 shadow-2xs">
+              <Layers className="w-6 h-6" />
+            </div>
+            <h4 className="text-base font-bold text-slate-900 tracking-tight mb-1">
+              Map configuration unavailable
+            </h4>
+            <p className="text-xs text-slate-600 max-w-md leading-relaxed mb-3">
+              A valid CARTO Basemaps API key (<code className="bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded font-mono-tech text-[11px]">VITE_CARTO_API_KEY</code>) is required to render geographical basemap tiles.
+            </p>
+            <div className="text-[11px] text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-md font-medium shadow-2xs">
+              Weather station telemetry and multi-model forecast calculations remain operational.
+            </div>
+          </div>
+        )}
 
         {/* Clean Scientific Legend Overlay (Top Left) */}
         <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur-xs border border-slate-200 rounded-md p-3 text-xs max-w-xs shadow-sm pointer-events-auto">
