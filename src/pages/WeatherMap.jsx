@@ -20,7 +20,7 @@ export function WeatherMap() {
             INDIA TEMPERATURE & WEATHER OBSERVATION MAP
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-            Spatially continuous 0.5° thermal heat-grid with surface observation stations, dynamic timeline progression, and multi-model blend controls.
+            Geospatial command center featuring continuous 0.5° thermal grids, animated wind vector streamlines, Doppler radar reflectivity, NAQI dispersion, and hybrid AI-NWP model blending.
           </p>
         </div>
 

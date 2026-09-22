@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { LOCATIONS, DEFAULT_LOCATION } from "../data/locations.js";
 import { isMockModeActive, setMockMode } from "../api/client.js";
+import { fetchLiveOpenMeteoStations } from "../api/mapApi.js";
 
 const WeatherContext = createContext(null);
 
 export function WeatherProvider({ children }) {
+  const [locationsList, setLocationsList] = useState(LOCATIONS);
   const [selectedLocation, setSelectedLocation] = useState(DEFAULT_LOCATION);
   const [timelineStep, setTimelineStep] = useState("NOW");
   const [activeVariable, setActiveVariable] = useState("temperature");
@@ -12,6 +14,8 @@ export function WeatherProvider({ children }) {
   const [isExplainModalOpen, setIsExplainModalOpen] = useState(false);
   const [isMockMode, setIsMockModeState] = useState(isMockModeActive());
   const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState(new Date());
 
   useEffect(() => {
     const handleMockChange = (e) => {
@@ -28,17 +32,47 @@ export function WeatherProvider({ children }) {
   };
 
   const selectLocationById = (id) => {
-    const found = LOCATIONS.find((l) => l.id === id);
+    const found = locationsList.find((l) => l.id === id);
     if (found) {
       setSelectedLocation(found);
     }
   };
 
+  // Real-time data refresh (Live Open-Meteo or calibrated simulation)
+  const refreshWeatherData = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetchLiveOpenMeteoStations(locationsList);
+      if (res && res.data && Array.isArray(res.data)) {
+        setLocationsList(res.data);
+        if (selectedLocation) {
+          const updatedSelected = res.data.find((l) => l.id === selectedLocation.id);
+          if (updatedSelected) {
+            setSelectedLocation(updatedSelected);
+          }
+        }
+      }
+      setLastRefreshed(new Date());
+    } catch (err) {
+      console.warn("Refresh weather data error:", err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [locationsList, selectedLocation]);
+
+  // Periodic polling every 5 minutes in background without interrupting UI
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshWeatherData();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [refreshWeatherData]);
+
   const value = {
     selectedLocation,
     setSelectedLocation,
     selectLocationById,
-    locationsList: LOCATIONS,
+    locationsList,
     timelineStep,
     setTimelineStep,
     activeVariable,
@@ -51,7 +85,10 @@ export function WeatherProvider({ children }) {
     isMockMode,
     toggleMockMode: handleToggleMock,
     isSearchingLocation,
-    setIsSearchingLocation
+    setIsSearchingLocation,
+    isRefreshing,
+    lastRefreshed,
+    refreshWeatherData
   };
 
   return (
