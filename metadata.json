@@ -1,0 +1,6 @@
+{
+  "name": "ALGORIOT - Hybrid Weather Intelligence",
+  "description": "Hybrid AI-NWP Multi-Model Forecast Blending System for Disaster Management (SIH26081) by Team Algoriot.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
