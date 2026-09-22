@@ -14,13 +14,13 @@ export function WeatherMap() {
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1">
             <Radio className="w-4 h-4 text-[#0b3d91]" />
-            <span>Synoptic Geospatial Observation</span>
+            <span>Interactive Geospatial Meteorological Network</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-            SYNOPTIC RADAR & NUMERICAL GRID VIEWER
+            INDIA TEMPERATURE & WEATHER OBSERVATION MAP
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-            Geospatial multi-model visualization across Indian meteorological radar stations and climate zones.
+            Spatially continuous 0.5° thermal heat-grid with surface observation stations, dynamic timeline progression, and multi-model blend controls.
           </p>
         </div>
 

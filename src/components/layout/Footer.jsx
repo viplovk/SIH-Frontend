@@ -44,7 +44,7 @@ export function Footer() {
               <li><Link to="/models" className="text-slate-600 hover:text-[#0b3d91] transition-colors">Model Contributions & Weights</Link></li>
               <li><Link to="/extremes" className="text-slate-600 hover:text-[#0b3d91] transition-colors">Disaster Early Warnings</Link></li>
               <li><Link to="/uncertainty" className="text-slate-600 hover:text-[#0b3d91] transition-colors">Quantified Uncertainty</Link></li>
-              <li><Link to="/research" className="text-slate-600 hover:text-[#0b3d91] transition-colors">Scientific Methodology</Link></li>
+              <li><Link to="/about" className="text-slate-600 hover:text-[#0b3d91] transition-colors">Architecture & Specifications</Link></li>
             </ul>
           </div>
 
@@ -73,8 +73,8 @@ export function Footer() {
               <span className="w-2 h-2 rounded-full bg-emerald-600" />
               Operational Frontend Active
             </span>
-            <Link to="/research" className="text-[#0b3d91] font-semibold hover:underline">
-              Technical Specification →
+            <Link to="/about" className="text-[#0b3d91] font-semibold hover:underline">
+              System Specifications →
             </Link>
           </div>
         </div>

@@ -125,3 +125,20 @@
   animation: status-pulse 2.5s ease-in-out infinite;
 }
 
+/* Custom Algoriot Scientific Leaflet Styles */
+.leaflet-popup.algoriot-scientific-popup .leaflet-popup-content {
+  margin: 6px 8px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup.algoriot-scientific-popup .leaflet-popup-content-wrapper {
+  padding: 2px !important;
+  border-radius: 8px !important;
+}
+
+.algoriot-city-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+

@@ -12,7 +12,6 @@ import { WeatherMap } from "./pages/WeatherMap.jsx";
 import { Models } from "./pages/Models.jsx";
 import { Extremes } from "./pages/Extremes.jsx";
 import { Uncertainty } from "./pages/Uncertainty.jsx";
-import { Research } from "./pages/Research.jsx";
 import { About } from "./pages/About.jsx";
 
 // Scroll restoration component
@@ -44,7 +43,6 @@ export default function App() {
               <Route path="/models" element={<Models />} />
               <Route path="/extremes" element={<Extremes />} />
               <Route path="/uncertainty" element={<Uncertainty />} />
-              <Route path="/research" element={<Research />} />
               <Route path="/about" element={<About />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

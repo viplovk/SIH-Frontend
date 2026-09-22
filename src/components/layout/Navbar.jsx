@@ -21,7 +21,6 @@ export function Navbar() {
     { name: "Models", path: "/models" },
     { name: "Extreme Weather", path: "/extremes" },
     { name: "Uncertainty", path: "/uncertainty" },
-    { name: "Research", path: "/research" },
     { name: "About", path: "/about" }
   ];
 

@@ -1,23 +1,38 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import L from "leaflet";
 import { 
   Play, 
   Pause, 
   RotateCcw, 
   MapPin, 
-  Radio, 
-  Info, 
-  Compass,
-  Layers
+  Compass, 
+  Layers, 
+  Thermometer, 
+  AlertTriangle, 
+  Maximize2,
+  Minimize2
 } from "lucide-react";
 import { useWeather } from "../../context/WeatherContext.jsx";
-import { TIMELINE_STEPS, FORECAST_VARIABLES } from "../../data/mockForecast.js";
+import { TIMELINE_STEPS } from "../../data/mockForecast.js";
+import { TemperatureHeatmap } from "./TemperatureHeatmap.jsx";
+import { MapLegend } from "./MapLegend.jsx";
+import { MapLayerControl } from "./MapLayerControl.jsx";
+import { createCityDivIcon, buildCityPopupHtml } from "./CityMarker.jsx";
+import { getLocationForecastAtStep } from "../../api/mapApi.js";
+
+// India geographic bounds
+const INDIA_BOUNDS = [
+  [6.8, 68.0],   // Southwest corner (Kanyakumari / Lakshadweep)
+  [37.2, 97.5]   // Northeast corner (Kashmir / Arunachal Pradesh)
+];
+
+const INDIA_CENTER = [22.8, 79.5];
 
 export function IndiaWeatherMap({ standalone = false }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
-  const weatherOverlayGroupRef = useRef(null);
+  const secondaryOverlayGroupRef = useRef(null);
 
   const { 
     selectedLocation, 
@@ -25,35 +40,54 @@ export function IndiaWeatherMap({ standalone = false }) {
     locationsList, 
     timelineStep, 
     setTimelineStep, 
-    activeVariable, 
-    setActiveVariable,
     isMockMode
   } = useWeather();
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showRadarSweep, setShowRadarSweep] = useState(false);
-  const [showStations, setShowStations] = useState(true);
-  const [mapZoom, setMapZoom] = useState(5);
+  const [mapZoom, setMapZoom] = useState(standalone ? 5.2 : 4.8);
+  const [heatmapOpacity, setHeatmapOpacity] = useState(0.75);
+
+  // Active layers state
+  const [layers, setLayers] = useState({
+    heatmap: true,
+    cityMarkers: true,
+    weatherOverlay: false,
+    extremeZones: false,
+    uncertainty: false
+  });
+
+  const toggleLayer = useCallback((layerId) => {
+    setLayers((prev) => ({
+      ...prev,
+      [layerId]: !prev[layerId]
+    }));
+  }, []);
 
   // Read CARTO Basemaps API key from environment
   const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY;
   const isMapConfigured = Boolean(cartoApiKey && typeof cartoApiKey === "string" && cartoApiKey.trim().length > 0);
 
-  // Initialize Leaflet Map with CartoDB Voyager Raster Tiles
+  // Initialize Leaflet Map with CARTO Voyager Raster Tiles
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    // Center on India (22.5° N, 82.5° E)
+    const initialCenter = selectedLocation ? [selectedLocation.lat, selectedLocation.lon] : INDIA_CENTER;
+
     const map = L.map(mapContainerRef.current, {
-      center: [selectedLocation.lat || 22.9734, selectedLocation.lon || 78.6569],
-      zoom: standalone ? 5 : 4.8,
+      center: initialCenter,
+      zoom: standalone ? 5.2 : 4.8,
       minZoom: 4,
-      maxZoom: 9,
+      maxZoom: 10,
+      maxBounds: [
+        [4.0, 60.0],
+        [40.0, 105.0]
+      ],
+      maxBoundsViscosity: 0.8,
       zoomControl: false,
       attributionControl: true
     });
 
-    // Only load CARTO basemap when a valid API key is configured to avoid watermarks
+    // CARTO Voyager Tiles with API key
     if (isMapConfigured) {
       L.tileLayer(
         `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${cartoApiKey}`,
@@ -69,206 +103,230 @@ export function IndiaWeatherMap({ standalone = false }) {
     // Clean Zoom Control at bottom right
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
-    // Layer groups for markers and meteorological heat anomalies
+    // Layer groups for markers and auxiliary overlays
+    const secondaryOverlayGroup = L.layerGroup().addTo(map);
     const markersGroup = L.layerGroup().addTo(map);
-    const weatherOverlayGroup = L.layerGroup().addTo(map);
 
+    secondaryOverlayGroupRef.current = secondaryOverlayGroup;
     markersGroupRef.current = markersGroup;
-    weatherOverlayGroupRef.current = weatherOverlayGroup;
     mapInstanceRef.current = map;
 
     map.on("zoomend", () => {
       setMapZoom(map.getZoom());
     });
 
+    // Invalidate size on container resize
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    resizeObserver.observe(mapContainerRef.current);
+
+    // Initial timeout to prevent blank map issue after page transition
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
     return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
       map.remove();
       mapInstanceRef.current = null;
     };
   }, [isMapConfigured]);
 
-  // Center map when selectedLocation changes
+  // Handle map center when selectedLocation changes externally
   useEffect(() => {
     if (mapInstanceRef.current && selectedLocation) {
-      mapInstanceRef.current.flyTo(
-        [selectedLocation.lat, selectedLocation.lon],
-        standalone ? 6 : Math.max(mapZoom, 5.5),
-        { duration: 1.0 }
-      );
+      const currentCenter = mapInstanceRef.current.getCenter();
+      const dist = Math.hypot(currentCenter.lat - selectedLocation.lat, currentCenter.lng - selectedLocation.lon);
+      // Only fly if not already centered on it
+      if (dist > 0.05) {
+        mapInstanceRef.current.flyTo(
+          [selectedLocation.lat, selectedLocation.lon],
+          Math.max(mapInstanceRef.current.getZoom(), 5.8),
+          { duration: 0.8 }
+        );
+      }
     }
-  }, [selectedLocation.id]);
+  }, [selectedLocation?.id]);
 
-  // Update weather layers and station markers when variable, timeline, or location changes
+  // Reset to full India View
+  const handleResetIndiaView = useCallback(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.fitBounds(INDIA_BOUNDS, {
+        padding: [24, 24],
+        animate: true,
+        duration: 0.8
+      });
+    }
+  }, []);
+
+  // Timeline Auto-play Loop
   useEffect(() => {
-    if (!mapInstanceRef.current || !markersGroupRef.current || !weatherOverlayGroupRef.current) return;
+    let interval = null;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setTimelineStep((curr) => {
+          const idx = TIMELINE_STEPS.indexOf(curr);
+          return TIMELINE_STEPS[(idx + 1) % TIMELINE_STEPS.length];
+        });
+      }, 2200);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, setTimelineStep]);
+
+  // Render City Markers and Secondary Overlays
+  useEffect(() => {
+    if (!mapInstanceRef.current || !markersGroupRef.current || !secondaryOverlayGroupRef.current) return;
 
     const markersGroup = markersGroupRef.current;
-    const overlayGroup = weatherOverlayGroupRef.current;
+    const secondaryGroup = secondaryOverlayGroupRef.current;
 
     markersGroup.clearLayers();
-    overlayGroup.clearLayers();
+    secondaryGroup.clearLayers();
 
-    const stepIdx = TIMELINE_STEPS.indexOf(timelineStep);
+    // 1. Render City Markers (Above heatmap at zIndex 600)
+    if (layers.cityMarkers) {
+      locationsList.forEach((loc) => {
+        const isSelected = loc.id === selectedLocation?.id;
+        const currentForecast = getLocationForecastAtStep(loc, timelineStep);
 
-    locationsList.forEach((loc) => {
-      const isSelected = loc.id === selectedLocation.id;
-      const base = loc.baseWeather;
-
-      // Calculate dynamic value based on activeVariable and timeline step
-      let val = 0;
-      let fillColor = "#0284c7";
-      let radiusKm = 170000;
-
-      if (activeVariable === "temperature") {
-        val = base.temperature + (stepIdx * 0.4) - (loc.lat > 25 ? 1 : 0);
-        fillColor = val > 36 ? "#dc2626" : val > 31 ? "#ea580c" : val > 27 ? "#0284c7" : "#4f46e5";
-      } else if (activeVariable === "precipitation") {
-        val = Math.max(5, base.precipitation + (stepIdx % 2 === 0 ? 10 : -5));
-        fillColor = val > 75 ? "#0891b2" : val > 50 ? "#2563eb" : "#94a3b8";
-        radiusKm = (val / 100) * 230000;
-      } else if (activeVariable === "wind") {
-        val = base.windSpeed + stepIdx * 1.5;
-        fillColor = val > 22 ? "#7c3aed" : val > 15 ? "#0284c7" : "#64748b";
-      } else if (activeVariable === "extremeRisk") {
-        const hasCritical = loc.extremeAlert?.severity === "CRITICAL";
-        const hasHigh = loc.extremeAlert?.severity === "HIGH";
-        fillColor = hasCritical ? "#dc2626" : hasHigh ? "#ea580c" : "#ca8a04";
-        radiusKm = hasCritical ? 250000 : 180000;
-      } else if (activeVariable === "humidity") {
-        val = Math.min(98, base.humidity + stepIdx * 2);
-        fillColor = val > 80 ? "#0369a1" : val > 65 ? "#0284c7" : "#94a3b8";
-      }
-
-      // Draw atmospheric field contour
-      const circle = L.circle([loc.lat, loc.lon], {
-        color: isSelected ? "#0b3d91" : fillColor,
-        weight: isSelected ? 2 : 1,
-        fillColor: fillColor,
-        fillOpacity: isSelected ? 0.28 : 0.16,
-        radius: radiusKm
-      });
-      overlayGroup.addLayer(circle);
-
-      // 2. Add Station Marker
-      if (showStations) {
-        const markerHtml = `
-          <div class="relative cursor-pointer">
-            <div class="w-4 h-4 rounded-full ${isSelected ? "bg-[#0b3d91] ring-3 ring-blue-300" : "bg-white ring-2 ring-slate-400"} flex items-center justify-center shadow-xs">
-              <div class="w-1.5 h-1.5 ${isSelected ? "bg-white" : "bg-slate-700"} rounded-full"></div>
-            </div>
-            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-white border ${isSelected ? "border-[#0b3d91] text-[#0b3d91] font-bold" : "border-slate-300 text-slate-700"} px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap shadow-xs pointer-events-none">
-              ${loc.name} ${activeVariable === "temperature" ? `${val.toFixed(0)}°` : ""}
-            </div>
-          </div>
-        `;
-
-        const customIcon = L.divIcon({
-          html: markerHtml,
-          className: "custom-station-pin",
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+        const icon = createCityDivIcon(loc, currentForecast, isSelected);
+        const marker = L.marker([loc.lat, loc.lon], {
+          icon,
+          zIndexOffset: isSelected ? 1000 : 100
         });
 
-        const marker = L.marker([loc.lat, loc.lon], { icon: customIcon });
+        const popupHtml = buildCityPopupHtml(loc, currentForecast, timelineStep);
+        marker.bindPopup(popupHtml, {
+          className: "algoriot-scientific-popup",
+          maxWidth: 320,
+          minWidth: 260
+        });
 
         marker.on("click", () => {
           setSelectedLocation(loc);
         });
 
-        // Clean white popup card
-        marker.bindPopup(`
-          <div class="p-1 font-sans text-xs text-slate-800">
-            <div class="font-bold text-slate-900 text-sm border-b border-slate-200 pb-1 mb-1">
-              ${loc.name} Station
-            </div>
-            <div class="text-slate-500 text-[11px] mb-1">
-              ${loc.state} • ${loc.terrain}
-            </div>
-            <div class="text-[#0b3d91] text-xs font-semibold mb-1">
-              Regime: ${loc.currentRegime}
-            </div>
-            <div class="grid grid-cols-2 gap-1.5 bg-slate-50 p-2 rounded border border-slate-200 mb-2 text-[11px]">
-              <div>Temp: <strong>${loc.baseWeather.temperature}°C</strong></div>
-              <div>Rain: <strong>${loc.baseWeather.precipitation}%</strong></div>
-              <div>Wind: <strong>${loc.baseWeather.windSpeed} km/h</strong></div>
-              <div>Humidity: <strong>${loc.baseWeather.humidity}%</strong></div>
-            </div>
-            <div class="text-slate-600 text-[10px] font-mono-tech">
-              Weights: NWP ${loc.modelWeights.nwp}% | AI-A ${loc.modelWeights.aiA}% | AI-B ${loc.modelWeights.aiB}%
-            </div>
-          </div>
-        `);
-
         markersGroup.addLayer(marker);
-      }
-    });
-
-  }, [selectedLocation.id, timelineStep, activeVariable, showStations, locationsList]);
-
-  // Timeline auto-player loop
-  useEffect(() => {
-    let interval;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setTimelineStep((prev) => {
-          const currentIndex = TIMELINE_STEPS.indexOf(prev);
-          const nextIndex = (currentIndex + 1) % TIMELINE_STEPS.length;
-          return TIMELINE_STEPS[nextIndex];
-        });
-      }, 1600);
+      });
     }
-    return () => clearInterval(interval);
-  }, [isPlaying, setTimelineStep]);
+
+    // 2. Render Secondary Layers if enabled:
+    // Weather Overlay (Precipitation & convective plumes)
+    if (layers.weatherOverlay) {
+      locationsList.forEach((loc) => {
+        const forecast = getLocationForecastAtStep(loc, timelineStep);
+        const precip = forecast.weather.precipitation || 0;
+        if (precip > 35) {
+          const rainRadius = (precip / 100) * 140000;
+          const circle = L.circle([loc.lat, loc.lon], {
+            color: "#0284c7",
+            weight: 1.5,
+            fillColor: "#38bdf8",
+            fillOpacity: 0.22,
+            dashArray: "4, 4",
+            radius: rainRadius,
+            interactive: false
+          });
+          secondaryGroup.addLayer(circle);
+        }
+      });
+    }
+
+    // Extreme Weather Zones
+    if (layers.extremeZones) {
+      locationsList.forEach((loc) => {
+        if (loc.extremeAlert) {
+          const isCritical = loc.extremeAlert.severity === "CRITICAL";
+          const isHigh = loc.extremeAlert.severity === "HIGH";
+          const alertColor = isCritical ? "#dc2626" : isHigh ? "#ea580c" : "#eab308";
+          
+          const alertCircle = L.circle([loc.lat, loc.lon], {
+            color: alertColor,
+            weight: 2,
+            fillColor: alertColor,
+            fillOpacity: 0.25,
+            radius: isCritical ? 160000 : 110000,
+            interactive: false
+          });
+          secondaryGroup.addLayer(alertCircle);
+        }
+      });
+    }
+
+    // Uncertainty & Model Spread (confidence envelopes)
+    if (layers.uncertainty) {
+      locationsList.forEach((loc) => {
+        const spreadRadius = 90000 + (loc.elevation > 500 ? 50000 : 20000);
+        const uncertaintyCircle = L.circle([loc.lat, loc.lon], {
+          color: "#7c3aed",
+          weight: 1,
+          fillColor: "#8b5cf6",
+          fillOpacity: 0.12,
+          dashArray: "2, 6",
+          radius: spreadRadius,
+          interactive: false
+        });
+        secondaryGroup.addLayer(uncertaintyCircle);
+      });
+    }
+  }, [layers, locationsList, selectedLocation?.id, timelineStep, setSelectedLocation]);
 
   return (
-    <div className={`bg-white border border-slate-200 rounded-lg overflow-hidden flex flex-col ${standalone ? "h-[calc(100vh-140px)]" : "h-[540px] sm:h-[600px]"} relative shadow-xs`}>
+    <div className={`flex flex-col bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm ${
+      standalone ? "h-[740px] lg:h-[820px]" : "h-[540px] sm:h-[600px]"
+    }`}>
       
-      {/* Map Control Bar Top (Scientific institutional controls) */}
-      <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 z-20">
+      {/* Top Map Action Toolbar */}
+      <div className="bg-slate-50 px-3.5 sm:px-5 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5 z-20">
         
-        {/* Variable Selector: TEMPERATURE, PRECIPITATION, WIND, HUMIDITY, EXTREME RISK */}
-        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 mr-1 hidden sm:inline">
-            Layer:
-          </span>
-          {FORECAST_VARIABLES.map((v) => {
-            const isActive = activeVariable === v.id;
-            return (
-              <button
-                key={v.id}
-                onClick={() => setActiveVariable(v.id)}
-                className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
-                  isActive
-                    ? "bg-[#0b3d91] text-white shadow-2xs"
-                    : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {v.label}
-              </button>
-            );
-          })}
-        </div>
+        {/* Left: Active Status & Reset India View */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-800">
+            <Compass className="w-3.5 h-3.5 text-[#0b3d91]" />
+            <span>India Weather Map</span>
+          </div>
 
-        {/* View Options */}
-        <div className="flex items-center gap-2 text-xs">
+          <span className="text-slate-300">|</span>
+
           <button
-            onClick={() => setShowStations(!showStations)}
-            className={`px-3 py-1.5 rounded border text-xs font-medium flex items-center gap-1.5 cursor-pointer ${
-              showStations 
-                ? "bg-slate-200 text-slate-900 border-slate-300" 
-                : "bg-white text-slate-600 border-slate-200"
-            }`}
+            onClick={handleResetIndiaView}
+            className="px-2.5 py-1 rounded bg-white hover:bg-slate-100 border border-slate-200 text-[11px] font-semibold text-[#0b3d91] flex items-center gap-1 shadow-2xs cursor-pointer transition-colors"
+            title="Fit India Boundaries"
           >
-            <MapPin className="w-3.5 h-3.5 text-[#0b3d91]" />
-            <span>Stations</span>
+            <RotateCcw className="w-3 h-3" />
+            <span>Fit India</span>
           </button>
         </div>
 
+        {/* Right: Quick Station Indicator */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-slate-500 hidden sm:inline">Active Focus:</span>
+          <span className="font-bold text-slate-900 bg-white border border-slate-200 px-2.5 py-1 rounded shadow-2xs">
+            {selectedLocation?.name || "All India"} ({selectedLocation?.lat.toFixed(1)}°N)
+          </span>
+          <span className="text-[10px] font-mono-tech px-1.5 py-0.5 rounded bg-blue-50 text-[#0b3d91] font-semibold border border-blue-200">
+            T{timelineStep}
+          </span>
+        </div>
       </div>
 
-      {/* Main Map Container */}
+      {/* Main Interactive Map Stage */}
       <div className="relative flex-1 w-full bg-slate-100">
         <div ref={mapContainerRef} className="w-full h-full" />
+
+        {/* Temperature Heatmap Layer Canvas */}
+        {mapInstanceRef.current && (
+          <TemperatureHeatmap
+            map={mapInstanceRef.current}
+            timelineStep={timelineStep}
+            opacity={heatmapOpacity}
+            visible={layers.heatmap}
+          />
+        )}
 
         {/* Graceful Fallback if CARTO Basemaps API key is missing */}
         {!isMapConfigured && (
@@ -283,79 +341,72 @@ export function IndiaWeatherMap({ standalone = false }) {
               A valid CARTO Basemaps API key (<code className="bg-slate-200 text-slate-800 px-1.5 py-0.5 rounded font-mono-tech text-[11px]">VITE_CARTO_API_KEY</code>) is required to render geographical basemap tiles.
             </p>
             <div className="text-[11px] text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-md font-medium shadow-2xs">
-              Weather station telemetry and multi-model forecast calculations remain operational.
+              Temperature heatmap calculations and weather telemetry remain operational.
             </div>
           </div>
         )}
 
-        {/* Clean Scientific Legend Overlay (Top Left) */}
-        <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur-xs border border-slate-200 rounded-md p-3 text-xs max-w-xs shadow-sm pointer-events-auto">
-          <div className="flex items-center justify-between text-slate-900 font-bold border-b border-slate-100 pb-1.5 mb-1.5">
-            <span className="uppercase tracking-wider text-[11px] text-[#0b3d91]">{activeVariable} SYNTHESIS</span>
-            <span className="text-[10px] font-mono-tech text-slate-500 font-normal">T+{timelineStep}</span>
-          </div>
-
-          <div className="text-xs text-slate-700 mb-1">
-            Station Focus: <strong className="text-slate-900">{selectedLocation.name}</strong> ({selectedLocation.lat.toFixed(2)}°N)
-          </div>
-
-          <div className="text-[11px] text-slate-500 leading-normal">
-            Click any station on the map to switch active focus and view multi-model allocation.
-          </div>
-
-          {isMockMode && (
-            <div className="mt-2 pt-1.5 border-t border-slate-100 text-[10px] text-amber-700 font-medium">
-              ● Simulated operational demonstration data
-            </div>
-          )}
+        {/* Floating Top-Right: Map Layer Controls */}
+        <div className="absolute top-3 right-3 z-20">
+          <MapLayerControl
+            layers={layers}
+            onToggleLayer={toggleLayer}
+          />
         </div>
 
-        {/* Coordinates Reticle indicator Bottom Left */}
-        <div className="absolute bottom-4 left-3 z-20 bg-white/90 px-2.5 py-1 rounded text-[11px] font-mono-tech text-slate-600 border border-slate-200 shadow-2xs">
-          COORD: {selectedLocation.lat.toFixed(3)}°N, {selectedLocation.lon.toFixed(3)}°E • ELEV: {selectedLocation.elevation}m
-        </div>
+        {/* Floating Bottom-Left: Professional Temperature Scale Legend */}
+        {layers.heatmap && (
+          <div className="absolute bottom-4 left-3 z-20">
+            <MapLegend
+              isMockMode={isMockMode}
+              opacity={heatmapOpacity}
+              onOpacityChange={setHeatmapOpacity}
+            />
+          </div>
+        )}
 
+        {/* Map Coordinates Reticle indicator Bottom Right */}
+        <div className="absolute bottom-3 right-14 z-20 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded text-[10px] font-mono-tech text-slate-600 border border-slate-200 shadow-2xs hidden sm:block">
+          SURVEY BOUNDS: 8.0°N–37.0°N / 68.0°E–97.0°E • EPSG:3857
+        </div>
       </div>
 
       {/* Bottom Timeline Controls Bar */}
       <div className="bg-slate-50 px-4 sm:px-6 py-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 z-20">
         
         {/* Play/Pause Control */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-[#0b3d91] hover:bg-[#072a66] text-white text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer shadow-2xs"
+            className={`px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer ${
+              isPlaying
+                ? "bg-amber-600 hover:bg-amber-700 text-white"
+                : "bg-[#0b3d91] hover:bg-[#082a66] text-white"
+            }`}
           >
-            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isPlaying ? "PAUSE" : "ANIMATE TIMELINE"}</span>
+            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+            <span>{isPlaying ? "PAUSE FORECAST" : "ANIMATE TIMELINE"}</span>
           </button>
 
-          <button
-            onClick={() => {
-              setIsPlaying(false);
-              setTimelineStep("NOW");
-            }}
-            title="Reset to NOW"
-            className="p-1.5 rounded bg-white text-slate-600 hover:text-slate-900 border border-slate-200 cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
+          <span className="text-xs text-slate-500 font-mono-tech sm:ml-2">
+            STEP: <strong>{timelineStep}</strong>
+          </span>
         </div>
 
-        {/* Forecast Timeline Steps (NOW, +3H, +6H, +12H, +24H, +48H, +72H) */}
-        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto w-full sm:w-auto justify-center">
+        {/* Timeline Horizon Buttons */}
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 justify-center">
           {TIMELINE_STEPS.map((step) => {
-            const isCurrent = timelineStep === step;
+            const isSelected = step === timelineStep;
             return (
               <button
                 key={step}
                 onClick={() => {
-                  setIsPlaying(false);
                   setTimelineStep(step);
+                  setIsPlaying(false);
                 }}
-                className={`px-3 py-1 rounded text-xs font-semibold font-mono-tech transition-colors cursor-pointer ${
-                  isCurrent
-                    ? "bg-[#0b3d91] text-white shadow-2xs"
+                className={`px-2.5 sm:px-3 py-1 text-xs font-mono-tech rounded transition-all cursor-pointer ${
+                  isSelected
+                    ? "bg-[#0b3d91] text-white font-bold shadow-2xs"
                     : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
@@ -363,6 +414,12 @@ export function IndiaWeatherMap({ standalone = false }) {
               </button>
             );
           })}
+        </div>
+
+        {/* Technical Reference Note */}
+        <div className="hidden lg:flex items-center text-[11px] text-slate-500 gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#0b3d91]" />
+          <span>India-wide 0.5° Temperature Heat-Grid</span>
         </div>
 
       </div>

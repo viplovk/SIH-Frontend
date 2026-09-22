@@ -1,3 +1,5 @@
+import { LOCATIONS } from "./locations.js";
+
 // Realistic Meteorological Simulation Data for Algoriot Multi-Model Blending
 // Clearly labeled as ILLUSTRATIVE DEMO DATA until live backend pipeline is activated.
 
@@ -33,16 +35,11 @@ export function generateTimelineData(locationId = "delhi", horizonId = "24h") {
   const labels = timeLabels[horizonId] || timeLabels["24h"];
 
   // Base parameters per location
-  let baseTemp = 31.4;
-  let basePrecip = 4.2;
-  let baseWind = 14;
-  let baseHumid = 68;
-
-  if (locationId === "mumbai") { baseTemp = 29.8; basePrecip = 12.5; baseWind = 24; baseHumid = 86; }
-  else if (locationId === "ahmedabad") { baseTemp = 39.8; basePrecip = 0.0; baseWind = 15; baseHumid = 32; }
-  else if (locationId === "guwahati") { baseTemp = 28.5; basePrecip = 18.0; baseWind = 11; baseHumid = 92; }
-  else if (locationId === "bengaluru") { baseTemp = 26.8; basePrecip = 2.1; baseWind = 12; baseHumid = 62; }
-  else if (locationId === "kolkata") { baseTemp = 33.1; basePrecip = 6.4; baseWind = 18; baseHumid = 78; }
+  const loc = LOCATIONS.find((l) => l.id === locationId);
+  const baseTemp = loc?.baseWeather?.temperature ?? 31.4;
+  const basePrecip = loc?.baseWeather?.precipitation ? loc.baseWeather.precipitation / 10 : 4.2;
+  const baseWind = loc?.baseWeather?.windSpeed ?? 14;
+  const baseHumid = loc?.baseWeather?.humidity ?? 68;
 
   return labels.map((time, idx) => {
     // Diurnal variation and atmospheric trend
