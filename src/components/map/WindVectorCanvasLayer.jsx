@@ -1,34 +1,26 @@
-// Algoriot Real Wind Vector Field & Streamline Particle Engine
-// Real-time advection driven by physical u/v vector fields from Open-Meteo
+// Algoriot Real Continuous Wind Vector Particle Engine
+// Renders physical streamlines advected by Open-Meteo u/v velocity fields
+// Uses HTML5 Canvas layered above base map and beneath UI controls
 import React, { useEffect, useRef } from "react";
 import { getIndiaBoundary } from "../../api/mapApi.js";
 
-/**
- * Velocity-dependent particle coloring (km/h)
- */
-function getParticleColor(speedKmh) {
-  if (speedKmh < 6) return "rgba(147, 197, 253, 0.85)";  // Ice Blue (<6 km/h)
-  if (speedKmh < 14) return "rgba(56, 189, 248, 0.9)";   // Sky Cyan (6-14 km/h)
-  if (speedKmh < 24) return "rgba(52, 211, 153, 0.95)";  // Emerald (14-24 km/h)
-  if (speedKmh < 36) return "rgba(251, 191, 36, 0.95)";  // Amber (24-36 km/h)
-  if (speedKmh < 50) return "rgba(248, 113, 113, 0.98)"; // Coral Red (36-50 km/h)
-  return "rgba(192, 132, 252, 1.0)";                    // Gale Violet (>50 km/h)
-}
+const PARTICLE_COUNT = 900;
 
 export function WindVectorCanvasLayer({
   map,
   stations = [],
   frameIndex = 0,
   visible = true,
-  opacity = 0.9
+  opacity = 0.75
 }) {
   const canvasRef = useRef(null);
+  const animFrameRef = useRef(null);
   const boundaryRef = useRef(null);
   const particlesRef = useRef([]);
-  const animFrameRef = useRef(null);
+  const roRef = useRef(null);
   const lastTimeRef = useRef(performance.now());
 
-  // Load India GeoJSON polygon for strict boundary clipping
+  // Load India Boundary Polygon for Frustum Masking
   useEffect(() => {
     try {
       const geo = getIndiaBoundary();
@@ -39,13 +31,20 @@ export function WindVectorCanvasLayer({
     }
   }, []);
 
-  // Initialize and run Canvas particle simulation
-  useEffect(() => {
-    if (!map || !map._mapPane || !stations || stations.length === 0) return;
+  // Wind speed color ramp for particle streamlines
+  const getParticleColor = (speedKmh) => {
+    if (speedKmh < 8) return "rgba(186, 230, 253, 0.65)"; // Light breeze (sky-200)
+    if (speedKmh < 18) return "rgba(56, 189, 248, 0.85)";  // Moderate wind (sky-400)
+    if (speedKmh < 32) return "rgba(14, 165, 233, 0.90)";  // Fresh gale (sky-500)
+    if (speedKmh < 48) return "rgba(234, 179, 8, 0.95)";   // Strong wind (amber-500)
+    return "rgba(239, 68, 68, 0.98)";                     // Severe storm / cyclone (red-500)
+  };
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.innerWidth < 768;
-    const PARTICLE_COUNT = prefersReducedMotion ? 120 : isMobile ? 350 : 800;
+  useEffect(() => {
+    if (!map || !map._mapPane) return;
+
+    const container = map.getContainer();
+    if (!container) return;
 
     // Create Canvas overlay
     const canvas = document.createElement("canvas");
@@ -58,8 +57,6 @@ export function WindVectorCanvasLayer({
     canvas.style.pointerEvents = "none";
     canvas.style.zIndex = "360";
 
-    const container = map.getContainer();
-    if (!container) return;
     container.appendChild(canvas);
     canvasRef.current = canvas;
 
@@ -98,6 +95,7 @@ export function WindVectorCanvasLayer({
         sumSpeed += (f?.windSpeed || 10) * w;
       }
 
+      if (sumW === 0) return { u: 0, v: 0, speed: 0 };
       const u = sumU / sumW;
       const v = sumV / sumW;
       const speed = sumSpeed / sumW;
@@ -108,30 +106,31 @@ export function WindVectorCanvasLayer({
 
     const animate = (timestamp) => {
       if (!canvasRef.current || !map || !map._mapPane) return;
-      
+
       try {
         const cvs = canvasRef.current;
-        const size = map.getSize();
+        const rect = container.getBoundingClientRect();
+        const width = Math.round(rect.width);
+        const height = Math.round(rect.height);
 
-        if (size.x === 0 || size.y === 0) {
+        if (width <= 0 || height <= 0) {
           animFrameRef.current = requestAnimationFrame(animate);
           return;
         }
 
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const width = size.x;
-        const height = size.y;
 
-        if (cvs.width !== width * dpr || cvs.height !== height * dpr) {
-          cvs.width = width * dpr;
-          cvs.height = height * dpr;
+        if (cvs.width !== Math.round(width * dpr) || cvs.height !== Math.round(height * dpr)) {
+          cvs.width = Math.round(width * dpr);
+          cvs.height = Math.round(height * dpr);
           cvs.style.width = `${width}px`;
           cvs.style.height = `${height}px`;
         }
 
         const ctx = cvs.getContext("2d");
-        ctx.save();
-        ctx.scale(dpr, dpr);
+        if (!ctx) return;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         // Motion blur trail effect
         ctx.globalCompositeOperation = "destination-in";
@@ -140,36 +139,34 @@ export function WindVectorCanvasLayer({
 
         ctx.globalCompositeOperation = "source-over";
 
-        if (!isLayerVisible) {
+        if (!isLayerVisible || opacity <= 0) {
           ctx.clearRect(0, 0, width, height);
-          ctx.restore();
           animFrameRef.current = requestAnimationFrame(animate);
           return;
         }
 
-        ctx.globalAlpha = opacity;
+        ctx.save();
 
-        // Clip strictly to India geographic boundary
+        // 1. Strict Map Viewport Clip: particles NEVER draw outside the map container!
+        ctx.beginPath();
+        ctx.rect(0, 0, width, height);
+        ctx.clip();
+
+        // 2. Strict India geographic boundary clip
         const boundary = boundaryRef.current;
         if (boundary && boundary.length > 2) {
           ctx.beginPath();
-          let started = false;
           for (let i = 0; i < boundary.length; i++) {
             const [lon, lat] = boundary[i];
             const pt = map.latLngToContainerPoint([lat, lon]);
-            if (!started) {
-              ctx.moveTo(pt.x, pt.y);
-              started = true;
-            } else {
-              ctx.lineTo(pt.x, pt.y);
-            }
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
           }
           ctx.closePath();
           ctx.clip();
         }
 
-        const delta = Math.min((timestamp - lastTimeRef.current) / 1000, 0.1);
-        lastTimeRef.current = timestamp;
+        ctx.globalAlpha = opacity;
 
         const zoom = map.getZoom();
         // Pixel scaling factor based on zoom level
@@ -195,8 +192,6 @@ export function WindVectorCanvasLayer({
           const pt1 = map.latLngToContainerPoint([p.lat, p.lon]);
 
           // Advect particle along real meteorological vector components
-          // u = Eastward velocity (positive lon)
-          // v = Northward velocity (positive lat)
           const dLon = wind.u * velocityScale;
           const dLat = wind.v * velocityScale;
 
@@ -208,8 +203,8 @@ export function WindVectorCanvasLayer({
 
           // Frustum culling
           if (
-            pt1.x < -20 || pt1.x > width + 20 ||
-            pt1.y < -20 || pt1.y > height + 20
+            pt1.x < 0 || pt1.x > width ||
+            pt1.y < 0 || pt1.y > height
           ) {
             continue;
           }
@@ -232,12 +227,26 @@ export function WindVectorCanvasLayer({
 
     animFrameRef.current = requestAnimationFrame(animate);
 
+    // ResizeObserver on map container
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(() => {
+        // Will resize automatically in next animation tick
+      });
+      ro.observe(container);
+      roRef.current = ro;
+    }
+
     return () => {
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
       }
+      if (roRef.current) {
+        roRef.current.disconnect();
+        roRef.current = null;
+      }
       if (canvasRef.current && canvasRef.current.parentNode) {
         canvasRef.current.parentNode.removeChild(canvasRef.current);
+        canvasRef.current = null;
       }
     };
   }, [map, stations, frameIndex, visible, opacity]);

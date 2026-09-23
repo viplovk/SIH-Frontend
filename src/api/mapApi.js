@@ -6,6 +6,7 @@ import indiaBoundaryData from "../data/india/india-boundary.json";
 import { LOCATIONS } from "../data/locations.js";
 import { fetchLiveBatchAqi, getAqiCategory } from "./airQualityApi.js";
 import { getApiConfig } from "./client.js";
+import { getOrBuildSpatialGrid } from "../components/map/weatherRasterEngine.js";
 
 // Bounding Box for India Subcontinent
 export const INDIA_BBOX = {
@@ -345,32 +346,12 @@ export async function fetchLiveMeteorologicalDataset(forceRefresh = false) {
 
 /**
  * Returns Normalized Spatial Grid for Section 9 endpoints
+ * Full 2D regular geographic grid matching width * height
  */
 export async function getNormalizedSpatialGrid(variable = "temperature", frameIndex = 0) {
   const dataset = await fetchLiveMeteorologicalDataset();
   const frameInfo = FORECAST_OFFSETS[frameIndex] || FORECAST_OFFSETS[0];
-
-  const points = dataset.stations.map((s) => {
-    const frame = s.forecastSeries[frameIndex] || s.current;
-    let val = frame[variable];
-    if (variable === "wind") {
-      return {
-        lat: s.lat,
-        lon: s.lon,
-        name: s.name,
-        speed: frame.windSpeed,
-        direction: frame.windDirection,
-        u: frame.u,
-        v: frame.v
-      };
-    }
-    return {
-      lat: s.lat,
-      lon: s.lon,
-      name: s.name,
-      value: val
-    };
-  });
+  const grid = getOrBuildSpatialGrid(dataset.stations, variable, frameIndex);
 
   const unitMap = {
     temperature: "°C",
@@ -382,35 +363,21 @@ export async function getNormalizedSpatialGrid(variable = "temperature", frameIn
     cloudCover: "%"
   };
 
-  const baseResponse = {
-    source: "open-meteo",
+  return {
+    source: "Open-Meteo Operational Forecast & CPCB Air Quality",
     timestamp: dataset.retrievedAt,
     valid_time: frameInfo.validTime || dataset.retrievedAt,
     is_live: frameInfo.isLive,
     timeline_label: frameInfo.label,
+    variable,
     unit: unitMap[variable] || "",
-    bbox: dataset.bbox,
-    width: 10,
-    height: 10,
-    latitudes: points.map((p) => p.lat),
-    longitudes: points.map((p) => p.lon)
-  };
-
-  if (variable === "wind") {
-    return {
-      ...baseResponse,
-      u: points.map((p) => p.u),
-      v: points.map((p) => p.v),
-      speed: points.map((p) => p.speed),
-      direction: points.map((p) => p.direction),
-      grid: points
-    };
-  }
-
-  return {
-    ...baseResponse,
-    values: points.map((p) => p.value),
-    grid: points
+    bbox: grid.bbox,
+    width: grid.width,
+    height: grid.height,
+    latitudes: Array.from(grid.latitudes),
+    longitudes: Array.from(grid.longitudes),
+    values: Array.from(grid.values),
+    corners: grid.corners
   };
 }
 
